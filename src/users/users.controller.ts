@@ -1,7 +1,11 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ClassSerializer } from 'src/serializers/class.serializer';
 import { CreateUserDto } from './dto/createUser.dto';
+import { User } from './users.entity';
 import { UsersService } from './users.service';
 
+@ApiTags('User')
 @Controller('users')
 export class UsersController {
   constructor(
@@ -10,12 +14,16 @@ export class UsersController {
 
   }
 
-  @Post()
+  @ClassSerializer(User)
+  @Post('/')
+  @ApiResponse({ type: User })
   create(@Body() userDto: CreateUserDto): Promise<CreateUserDto> {
     return this.usersService.createUser(userDto)
   }
 
-  @Get()
+  @ClassSerializer(User)
+  @Get('/')
+  @ApiResponse({ type: [User] })
   getAll() {
     return this.usersService.getAllUsers()
   }
