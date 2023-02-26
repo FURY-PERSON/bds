@@ -1,6 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { Role } from 'src/roles/roles.entity';
 
 @Entity({ name: "user" })
 export class User {
@@ -8,7 +9,7 @@ export class User {
   @Exclude()
   id: string;
 
-  @ApiProperty({description: 'aaaa'})
+  @ApiProperty()
   @Column()
   firstName: string;
 
@@ -30,9 +31,22 @@ export class User {
   @Exclude()
   password: string
 
+  @UpdateDateColumn()
+  @Exclude()
+  updatedAt: Date;
+
+  @Column()
+  @CreateDateColumn()
+  @Exclude()
+  createdAt: Date;
+
   @ApiProperty()
   @Column({
     nullable: true
   })
   email?: string
+
+  @ManyToMany(() => Role)
+  @JoinTable()
+  roles?: Role[];
 }
