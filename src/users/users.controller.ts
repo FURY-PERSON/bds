@@ -2,8 +2,8 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/decorators/roles.decorator';
 import { WithRole } from 'src/decorators/withRoles.decorator';
-import { CreateRoleDto } from 'src/roles/dto/createRole.dto';
 import { ClassSerializer } from 'src/serializers/class.serializer';
+import { AddRolesDto } from './dto/addRoles.dto';
 import { CreateUserDto } from './dto/createUser.dto';
 import { User } from './users.entity';
 import { UsersService } from './users.service';
@@ -38,5 +38,12 @@ export class UsersController {
   @ApiResponse({ type: [User] })
   getById(@Param('login') login: string): Promise<User> {
     return this.usersService.getByLogin(login)
+  }
+
+  @ClassSerializer(User)
+  @Post('/role')
+  @ApiResponse({ type: [User] })
+  addRoles(@Body() addRolesDto: AddRolesDto): Promise<User> {
+    return this.usersService.addRoles(addRolesDto)
   }
 }

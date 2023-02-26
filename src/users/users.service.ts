@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { uniqueArray } from 'src/helpers/uniqueArray';
 import { RolesService } from 'src/roles/roles.service';
 import { Repository } from 'typeorm';
+import { AddRolesDto } from './dto/addRoles.dto';
 import { CreateUserDto } from './dto/createUser.dto';
 import { User } from './users.entity';
 
@@ -43,5 +45,30 @@ export class UsersService {
       }
     });
     return user;
+  }
+
+  async addRoles(addRolesDto: AddRolesDto) {
+    const user = await this.usersRepository.findOne({
+      where: {id: addRolesDto.userId},
+      relations: {
+        roles: true
+      }
+    })
+
+    if(!user) {
+      new HttpException('User not found', HttpStatus.NOT_FOUND)
+    }
+
+    const roles = await this.roleService.getAllRolesByName(addRolesDto.roles);
+
+    addRolesDto.roles.forEach((roleName) => {
+      if(!roles.some((role) => role.name === roleName)) {
+        throw new HttpException(`Role ${roleName} doen't exist`, HttpStatus.BAD_REQUEST)
+      }
+    })
+
+    user.roles = uniqueArray([...user.roles, ...roles]);
+
+    return this.usersRepository.save(user)
   }
 }
