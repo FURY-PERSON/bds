@@ -16,12 +16,12 @@ export class UsersService {
   }
 
   async createUser(userDto: CreateUserDto) {
-    const user = this.usersRepository.save({
-      ...this.usersRepository.create(userDto),
-      roles: [await this.roleService.getByName('USER')]
-    })
+    const user = this.usersRepository.create(userDto);
+    const userRole = await this.roleService.getByName('USER'); 
+    const roles = [userRole]
+    user.roles = roles;
 
-    return user;
+    return this.usersRepository.save(user);
   }
 
   async getAllUsers() {
@@ -31,5 +31,17 @@ export class UsersService {
       }
     });
     return users;
+  }
+  
+  async getByLogin(login: string) {
+    const user = await this.usersRepository.findOne({
+      where: {
+        login: login
+      },
+      relations: {
+        roles: true
+      }
+    });
+    return user;
   }
 }

@@ -1,5 +1,6 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CreateRoleDto } from 'src/roles/dto/createRole.dto';
 import { ClassSerializer } from 'src/serializers/class.serializer';
 import { CreateUserDto } from './dto/createUser.dto';
 import { User } from './users.entity';
@@ -26,5 +27,12 @@ export class UsersController {
   @ApiResponse({ type: [User] })
   getAll() {
     return this.usersService.getAllUsers()
+  }
+
+  @ClassSerializer(User)
+  @Get('/:login')
+  @ApiResponse({ type: [User] })
+  getById(@Param('login') login: string): Promise<User> {
+    return this.usersService.getByLogin(login)
   }
 }

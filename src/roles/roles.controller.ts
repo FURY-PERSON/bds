@@ -1,5 +1,7 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { WithAuth } from 'src/decorators/withAuth.decorator';
+import JwtAuthenticationGuard from 'src/guard/auth.guard';
 import { ClassSerializer } from 'src/serializers/class.serializer';
 import { CreateRoleDto } from './dto/createRole.dto';
 import { Role } from './roles.entity';
@@ -30,6 +32,7 @@ export class RolesController {
 
   @ClassSerializer(Role)
   @Get('/')
+  @WithAuth()
   @ApiResponse({ type: [Role] })
   getAll(): Promise<CreateRoleDto[]> {
     return this.roleService.getAllRoles()
