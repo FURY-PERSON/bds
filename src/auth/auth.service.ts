@@ -59,7 +59,7 @@ export class AuthService {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND)
     }
 
-    const passwordEquals = await bcrypt.compare(userFromBd.password, loginDto.password);
+    const passwordEquals = await bcrypt.compare(loginDto.password, userFromBd.password);
 
     if(!passwordEquals) {
       throw new UnauthorizedException('Incorrect login or password')
