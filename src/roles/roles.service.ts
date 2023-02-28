@@ -24,11 +24,9 @@ export class RolesService {
   }
 
   async getAllRolesByName(rolesNames: string[]) {
-    console.log('rolesNames', rolesNames)
     const roles = await this.rolesRepository.find({where: {
       name: In(rolesNames)
     }});
-    console.log('roles', roles)
     return roles;
   }
 

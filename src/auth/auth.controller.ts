@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ClassSerializer } from 'src/serializers/class.serializer';
 import { CreateUserDto } from 'src/users/dto/createUser.dto';
