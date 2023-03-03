@@ -1,7 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsArray, IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsString } from "class-validator";
 
-export class CreateRoleDto {
+export class CreatePermissionDto {
   @IsNotEmpty()
   @IsString()
   @ApiProperty()
@@ -11,9 +11,4 @@ export class CreateRoleDto {
   @IsString()
   @ApiProperty()
   description: string;
-
-  @IsNotEmpty()
-  @IsArray()
-  @ApiProperty()
-  permissionsIds: string[]
 }

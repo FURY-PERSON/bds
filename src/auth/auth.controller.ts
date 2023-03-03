@@ -2,7 +2,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ClassSerializer } from 'src/serializers/class.serializer';
 import { CreateUserDto } from 'src/users/dto/createUser.dto';
-import { User } from 'src/users/users.entity';
+import { User } from 'src/users/entities/users.entity';
 import { AuthService } from './auth.service';
 import { AuthTokenDto } from './dto/auth-token.dto';
 import { LoginDto } from './dto/login.dto';

@@ -5,7 +5,7 @@ import { WithRole } from 'src/decorators/withRoles.decorator';
 import { ClassSerializer } from 'src/serializers/class.serializer';
 import { AddRolesDto } from './dto/addRoles.dto';
 import { CreateUserDto } from './dto/createUser.dto';
-import { User } from './users.entity';
+import { User } from './entities/users.entity';
 import { UsersService } from './users.service';
 
 @ApiTags('User')

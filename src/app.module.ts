@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './users/users.entity';
+import { User } from './users/entities/users.entity';
 import { UsersModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
 import { Role } from './roles/roles.entity';
@@ -10,7 +10,9 @@ import { NewsModule } from './news/news.module';
 import { News } from './news/news.entity';
 import { FilesModule } from './files/files.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { PermissionsModule } from './permissions/permissions.module';
 import * as path from 'path';
+import { Permission } from './permissions/permisions.entity';
 
 @Module({
   controllers: [],
@@ -29,7 +31,7 @@ import * as path from 'path';
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
-      entities: [User, Role, News],
+      entities: [User, Role, News, Permission],
       autoLoadEntities: true,
       synchronize: true,
     }),
@@ -38,6 +40,7 @@ import * as path from 'path';
     AuthModule,
     NewsModule,
     FilesModule,
+    PermissionsModule,
   ],
 })
 export class AppModule {

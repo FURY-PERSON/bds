@@ -5,7 +5,7 @@ import { RolesService } from 'src/roles/roles.service';
 import { Repository } from 'typeorm';
 import { AddRolesDto } from './dto/addRoles.dto';
 import { CreateUserDto } from './dto/createUser.dto';
-import { User } from './users.entity';
+import { User } from './entities/users.entity';
 
 @Injectable()
 export class UsersService {

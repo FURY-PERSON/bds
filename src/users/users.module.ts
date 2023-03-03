@@ -4,7 +4,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import JwtAuthenticationGuard from 'src/guard/auth.guard';
 import { RolesModule } from 'src/roles/roles.module';
 import { UsersController } from './users.controller';
-import { User } from './users.entity';
+import { User } from './entities/users.entity';
 import { UsersService } from './users.service';
 
 @Module({
