@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { uniqueArray } from 'src/helpers/uniqueArray';
 import { RolesService } from 'src/roles/roles.service';
+import { Roles } from 'src/roles/types';
 import { Repository } from 'typeorm';
 import { AddRolesDto } from './dto/addRoles.dto';
 import { CreateUserDto } from './dto/createUser.dto';
@@ -19,9 +20,11 @@ export class UsersService {
 
   async createUser(userDto: CreateUserDto) {
     const user = this.usersRepository.create(userDto);
-    const userRole = await this.roleService.getByName('USER'); 
+    const userRole = await this.roleService.getByName(Roles.USER); 
+
     const roles = [userRole]
     user.roles = roles;
+    user.permissions = userRole.permissions;
 
     return this.usersRepository.save(user);
   }
@@ -29,8 +32,9 @@ export class UsersService {
   async getAllUsers() {
     const users = await this.usersRepository.find({
       relations: {
-        roles: true
-      }
+        roles: true,
+        permissions: true
+      },
     });
     return users;
   }
@@ -41,7 +45,8 @@ export class UsersService {
         login: login
       },
       relations: {
-        roles: true
+        roles: true,
+        permissions: true
       }
     });
     return user;
@@ -51,7 +56,8 @@ export class UsersService {
     const user = await this.usersRepository.findOne({
       where: {id: addRolesDto.userId},
       relations: {
-        roles: true
+        roles: true,
+        permissions: true
       }
     })
 
@@ -67,7 +73,12 @@ export class UsersService {
       }
     })
 
-    user.roles = uniqueArray([...user.roles, ...roles]);
+    const rolesSet = uniqueArray([...user.roles, ...roles]);
+    user.roles = rolesSet;
+
+    const rolesPermissions = rolesSet.map((role) => role.permissions).filter(Boolean).flat();
+
+    user.permissions =  uniqueArray([...user.permissions, ...rolesPermissions]) 
 
     return this.usersRepository.save(user)
   }

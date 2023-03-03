@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, PrimaryGenerat
 import { Exclude } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from 'src/roles/roles.entity';
+import { Permission } from 'src/permissions/permisions.entity';
 
 @Entity({ name: "user" })
 export class User {
@@ -49,4 +50,8 @@ export class User {
   @ManyToMany(() => Role)
   @JoinTable()
   roles?: Role[];
+
+  @ManyToMany(() => Permission)
+  @JoinTable()
+  permissions: Permission[];
 }

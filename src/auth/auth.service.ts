@@ -43,6 +43,7 @@ export class AuthService {
   private generateToken(user: User) {
     const payload = {
       roles: user.roles,
+      permissions: user.permissions,
       id: user.id,
       login: user.login
     }
