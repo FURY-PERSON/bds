@@ -1,9 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { uniqueArray } from 'src/helpers/uniqueArray';
+import { PermissionsService } from 'src/permissions/permissions.service';
 import { RolesService } from 'src/roles/roles.service';
 import { Roles } from 'src/roles/types';
 import { Repository } from 'typeorm';
+import { AddPermissionsDto } from './dto/addPermissions.dto';
 import { AddRolesDto } from './dto/addRoles.dto';
 import { CreateUserDto } from './dto/createUser.dto';
 import { User } from './entities/users.entity';
@@ -14,6 +16,7 @@ export class UsersService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     private roleService: RolesService,
+    private permissionService: PermissionsService,
     ) {
 
   }
@@ -49,6 +52,7 @@ export class UsersService {
         permissions: true
       }
     });
+    
     return user;
   }
 
@@ -69,7 +73,7 @@ export class UsersService {
 
     addRolesDto.roles.forEach((roleName) => {
       if(!roles.some((role) => role.name === roleName)) {
-        throw new HttpException(`Role ${roleName} doen't exist`, HttpStatus.BAD_REQUEST)
+        throw new HttpException(`Role ${roleName} doesn't exist`, HttpStatus.BAD_REQUEST)
       }
     })
 
@@ -79,6 +83,33 @@ export class UsersService {
     const rolesPermissions = rolesSet.map((role) => role.permissions).filter(Boolean).flat();
 
     user.permissions =  uniqueArray([...user.permissions, ...rolesPermissions]) 
+
+    return this.usersRepository.save(user)
+  }
+
+  async addPermissions(addRolesDto: AddPermissionsDto) {
+    const user = await this.usersRepository.findOne({
+      where: {id: addRolesDto.userId},
+      relations: {
+        roles: true,
+        permissions: true
+      }
+    })
+
+    if(!user) {
+      new HttpException('User not found', HttpStatus.NOT_FOUND)
+    }
+
+    const permissions = await this.permissionService.getAllPermissionsByIds(addRolesDto.permissions);
+
+    addRolesDto.permissions.forEach((roleName) => {
+      if(!permissions.some((role) => role.name === roleName)) {
+        throw new HttpException(`Permission ${roleName} doesn't exist`, HttpStatus.BAD_REQUEST)
+      }
+    })
+
+    const rolesSet = uniqueArray([...user.permissions, ...addRolesDto.permissions]);
+    user.permissions = rolesSet;
 
     return this.usersRepository.save(user)
   }

@@ -35,6 +35,6 @@ export class PermissionsController {
     @Query('ids') ids: string[]
     ): Promise<Permission[]> {
       const permissionIds = Array.isArray(ids) ? ids : [ids];
-    return this.permissionService.getAllRolesByIds(permissionIds)
+    return this.permissionService.getAllPermissionsByIds(permissionIds)
   }
 }

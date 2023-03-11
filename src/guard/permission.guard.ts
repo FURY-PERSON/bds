@@ -37,9 +37,7 @@ export default class PermissionGuard implements CanActivate {
         request.user = user;
 
         for(let i=0; i<requiredPermissions.length; i++) {
-          console.log(requiredPermissions)
           if(!user.permissions.some((permission) => {
-            console.log(permission.name, requiredPermissions[i])
             return permission.name === requiredPermissions[i]
           })) return false
         }

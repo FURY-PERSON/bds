@@ -17,7 +17,7 @@ export class RolesService {
 
   async createRole(userDto: CreateRoleDto) {
     const user = this.rolesRepository.create(userDto);
-    const permissions = await this.permissionsService.getAllRolesByIds(userDto.permissionsIds);
+    const permissions = await this.permissionsService.getAllPermissionsByIds(userDto.permissionsIds);
     user.permissions = permissions;
     return this.rolesRepository.save(user);
   }

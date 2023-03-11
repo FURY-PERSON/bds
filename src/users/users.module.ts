@@ -5,6 +5,7 @@ import { RolesModule } from 'src/roles/roles.module';
 import { UsersController } from './users.controller';
 import { User } from './entities/users.entity';
 import { UsersService } from './users.service';
+import { PermissionsModule } from 'src/permissions/permissions.module';
 
 @Module({
   controllers: [UsersController],
@@ -12,7 +13,8 @@ import { UsersService } from './users.service';
   imports: [
     TypeOrmModule.forFeature([User]),
     forwardRef(() => AuthModule),
-    RolesModule
+    RolesModule,
+    PermissionsModule
   ],
   exports: [
     UsersService,

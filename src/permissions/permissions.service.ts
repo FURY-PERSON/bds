@@ -22,7 +22,7 @@ export class PermissionsService {
     return this.permissionRepository.find();
   }
 
-  async getAllRolesByIds(ids: string[]) {
+  async getAllPermissionsByIds(ids: string[]) {
     return this.permissionRepository.find({
       where: {
         id: In(ids)

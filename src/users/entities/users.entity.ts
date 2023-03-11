@@ -49,7 +49,7 @@ export class User {
 
   @ManyToMany(() => Role)
   @JoinTable()
-  roles?: Role[];
+  roles: Role[];
 
   @ManyToMany(() => Permission)
   @JoinTable()
