@@ -54,4 +54,8 @@ export class User {
   @ManyToMany(() => Permission)
   @JoinTable()
   permissions: Permission[];
+
+  @Column({nullable: true})
+  @Exclude()
+  refreshToken?: string
 }

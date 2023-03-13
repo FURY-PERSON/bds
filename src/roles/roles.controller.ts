@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { WithAuth } from 'src/decorators/with-auth.decorator';
 import { ClassSerializer } from 'src/serializers/class.serializer';
 import { CreateRoleDto } from './dto/createRole.dto';
 import { Role } from './roles.entity';
@@ -33,6 +34,7 @@ export class RolesController {
 
   @ClassSerializer(Role)
   @Get('/')
+  @WithAuth()
   @ApiResponse({ type: [Role] })
   getAll(): Promise<Role[]> {
     return this.roleService.getAllRoles()

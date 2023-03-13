@@ -1,71 +1,114 @@
-import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { CreateUserDto } from 'src/users/dto/createUser.dto';
-import { User } from 'src/users/entities/users.entity';
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+
 import { UsersService } from 'src/users/users.service';
-import * as bcrypt from "bcryptjs"
-import { LoginDto } from './dto/login.dto';
+import * as argon2 from 'argon2';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+
+import { CreateUserDto } from 'src/users/dto/createUser.dto';
+import { AuthDto } from './dto/auth.dto';
+import { RefreshDto } from './dto/resresh.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private userService: UsersService,
+    private usersService: UsersService,
     private jwtService: JwtService,
-    ) {
-
-  }
-
-  async register(userDto: CreateUserDto) {
-    const {login, password} = userDto;
-
-    const user = await this.userService.getByLogin(login)
-
-    if(user) {
-      throw new HttpException('User already registered', HttpStatus.BAD_REQUEST)
+    private configService: ConfigService,
+  ) {}
+  async register(createUserDto: CreateUserDto) {
+    const userExists = await this.usersService.getByLogin(
+      createUserDto.login,
+    );
+    if (userExists) {
+      throw new BadRequestException('User already exists');
     }
 
-    const hashedPassword = await bcrypt.hash(password, 5);
 
-    const createdUser = await this.userService.createUser({...userDto, password: hashedPassword});
+    const hash = await this.hashData(createUserDto.password);
+    const newUser = await this.usersService.createUser({
+      ...createUserDto,
+      password: hash,
+    });
 
-    return this.generateToken(createdUser);
-  }
-
-  async login(loginDto: LoginDto) {
-    const user = await this.validateUser(loginDto);
-    const token = this.generateToken(user);
+    const tokens = await this.getTokens(newUser.id, newUser.login);
+    newUser.refreshToken = tokens.refreshToken;
+    await this.usersService.createUser(newUser)
     return {
-      token: token.token,
-      user
+      user: newUser,
+      tokens
     };
   }
 
-  private generateToken(user: User) {
-    const payload = {
-      roles: user.roles,
-      permissions: user.permissions,
-      id: user.id,
-      login: user.login
-    }
-
+	async login(data: AuthDto) {
+    const user = await this.usersService.getByLogin(data.login);
+    if (!user) throw new BadRequestException('User does not exist');
+    const passwordMatches = await argon2.verify(user.password, data.password);
+    if (!passwordMatches)
+      throw new BadRequestException('Password is incorrect');
+    const tokens = await this.getTokens(user.id, user.login);
+    user.refreshToken = tokens.refreshToken;
+    
+    const updatedUser = await this.usersService.updateByLogin(user.login, user)
     return {
-      token: this.jwtService.sign(payload)
-    }
+      user: updatedUser,
+      tokens
+    };
   }
 
-  private async validateUser(loginDto: LoginDto) {
-    const {login} = loginDto;
-    const userFromBd = await this.userService.getByLogin(login);
-    if(!userFromBd) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND)
-    }
+  async refresh(login: string, refreshDto: RefreshDto) {
+    const user = await this.usersService.getByLogin(login);
+    if (!user) throw new BadRequestException('User does not exist');
 
-    const passwordEquals = await bcrypt.compare(loginDto.password, userFromBd.password);
+    if(user.refreshToken !== refreshDto.refreshToken) throw new ForbiddenException('Access denided');
 
-    if(!passwordEquals) {
-      throw new UnauthorizedException('Incorrect login or password')
-    }
+    const tokens = await this.getTokens(user.id, user.login);
 
-    return userFromBd;
+    const updatedUser =  await this.usersService.updateByLogin(login, {
+      refreshToken: tokens.refreshToken,
+    });
+
+    return {
+      user: updatedUser,
+      tokens
+    };
+  }
+
+	async logout(login: string) {
+    return this.usersService.updateByLogin(login, { refreshToken: null });
+  }
+
+  hashData(data: string) {
+    return argon2.hash(data);
+  }
+
+  async getTokens(userId: string, login: string) {
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(
+        {
+          sub: userId,
+          login,
+        },
+        {
+          secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+          expiresIn: '15m',
+        },
+      ),
+      this.jwtService.signAsync(
+        {
+          sub: userId,
+          login,
+        },
+        {
+          secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+          expiresIn: '7d',
+        },
+      ),
+    ]);
+
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 }

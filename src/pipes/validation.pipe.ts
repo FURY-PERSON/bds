@@ -9,19 +9,19 @@ export class ValidationPipe implements PipeTransform<any> {
         if(!value) {
             return undefined
         }
-        
+
         let obj = plainToInstance(metadata.metatype!, value);
 
         if (metadata.type === 'param') {
-            obj = { obj };
+            return obj
         }
-        if (metadata.type === 'query') {
+        if (metadata.type === 'query') { 
             return value;
         } 
         if(obj?.buffer) {
             return obj
         }
-        const errors = await validate(obj, {});
+        const errors = await validate(obj, {forbidUnknownValues: false, skipUndefinedProperties: true});
 
         if (errors.length) {
             const messages = errors.map((err) => {

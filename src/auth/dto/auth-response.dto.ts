@@ -2,9 +2,13 @@ import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from 'src/users/entities/users.entity';
 
-export class AuthTokenDto {
+export class AuthResponseDto {
     @ApiProperty()
-    token: string;
+    tokens: {
+      access: string,
+      refresh: string
+    };
+
     @Type(() => User)
     @ApiProperty({ type: User })
     user: User;

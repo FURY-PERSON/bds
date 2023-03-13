@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { WithAuth } from 'src/decorators/with-auth.decorator';
 import { ClassSerializer } from 'src/serializers/class.serializer';
 import { CreatePermissionDto } from './dto/createPermission.dto';
 import { Permission } from './permisions.entity';
@@ -23,6 +24,7 @@ export class PermissionsController {
 
   @ClassSerializer(Permission)
   @Get('/')
+  @WithAuth()
   @ApiResponse({ type: [Permission] })
   getAll() {
     return this.permissionService.getAllPermissions()

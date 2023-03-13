@@ -1,32 +1,19 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
+import { ExecutionContext, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+
+import { AuthGuard } from '@nestjs/passport';
+import { Exception } from 'src/exceptions/types/exception';
+import { User } from 'src/users/entities/users.entity';
 
 @Injectable()
-export default class JwtAuthenticationGuard implements CanActivate {
-    constructor(
-        private jwtService: JwtService
-        ) {
-
+export default class JwtAuthenticationGuard extends AuthGuard('jwt') {
+    canActivate(context: ExecutionContext) {
+        return super.canActivate(context);
     }
 
-    canActivate(context: ExecutionContext) {
-        const request = context.switchToHttp().getRequest();
-
-        const authHeader = request.headers.authorization;
-        const bearer = authHeader?.split(' ')[0];
-        const token = authHeader?.split(' ')[1];
-
-        if(bearer !== 'Bearer' || !token) {
-            throw new UnauthorizedException('User unauthorized')
+    handleRequest<TUser extends User>(err: Exception, user: TUser) {
+        if (err || !user) {
+            throw new HttpException('FORBIDDEN', HttpStatus.FORBIDDEN)
         }
-
-        try {
-            const user = this.jwtService.verify(token);
-            request.user = user;
-        } catch(error) {
-            throw new UnauthorizedException(`token: ${error.message}`)
-        }
-
-        return true;
+        return user;
     }
 }

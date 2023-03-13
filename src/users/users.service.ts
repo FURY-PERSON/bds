@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import { AddPermissionsDto } from './dto/addPermissions.dto';
 import { AddRolesDto } from './dto/addRoles.dto';
 import { CreateUserDto } from './dto/createUser.dto';
+import { UpdateUserDto } from './dto/updateUser.dto';
 import { User } from './entities/users.entity';
 
 @Injectable()
@@ -112,5 +113,19 @@ export class UsersService {
     user.permissions = rolesSet;
 
     return this.usersRepository.save(user)
+  }
+
+  async updateByLogin(login: string, userDto: UpdateUserDto) {
+    const user = await this.usersRepository.findOne({where: {
+      login: login
+    }})
+
+    if(!user) {
+      throw new HttpException(`User do not exists`, HttpStatus.BAD_REQUEST)
+    }
+
+    const updatedUser = this.usersRepository.create({...user, ...userDto})
+
+    return this.usersRepository.save(updatedUser)
   }
 }
