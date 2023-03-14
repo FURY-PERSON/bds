@@ -43,14 +43,14 @@ export class UsersService {
     return users;
   }
   
-  async getByLogin(login: string) {
+  async getByLogin(login: string, relations = true) {
     const user = await this.usersRepository.findOne({
       where: {
         login: login
       },
       relations: {
-        roles: true,
-        permissions: true
+        roles: relations,
+        permissions: relations
       }
     });
     

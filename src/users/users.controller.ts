@@ -47,7 +47,7 @@ export class UsersController {
   }
 
   @ClassSerializer(User)
-  @Put('/role')
+  @Post('/role')
   @ApiResponse({ type: [User] })
   addRoles(@Body() addRolesDto: AddRolesDto): Promise<User> {
     return this.usersService.addRoles(addRolesDto)

@@ -11,7 +11,7 @@ export class ValidationPipe implements PipeTransform<any> {
         }
 
         let obj = plainToInstance(metadata.metatype!, value);
-
+        console.log('obj', value)
         if (metadata.type === 'param') {
             return obj
         }

@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { DormsModule } from 'src/dorms/dorms.module';
 import { FilesService } from 'src/files/files.service';
+import { UsersModule } from 'src/users/users.module';
 import { NewsController } from './news.controller';
 import { News } from './news.entity';
 import { NewsService } from './news.service';
@@ -9,10 +11,12 @@ import { NewsService } from './news.service';
   controllers: [NewsController],
   providers: [
     NewsService,
-    FilesService
+    FilesService,
   ],
   imports: [
     TypeOrmModule.forFeature([News]),
+    DormsModule,
+    UsersModule
   ]
 })
 export class NewsModule {}

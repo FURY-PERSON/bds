@@ -1,7 +1,8 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { DormsService } from 'src/dorms/dorms.service';
 import { FilesService } from 'src/files/files.service';
-import { app } from 'src/main';
+import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import { CreateNewsDto } from './dto/createNews.dto';
 import { News } from './news.entity';
@@ -12,12 +13,31 @@ export class NewsService {
     @InjectRepository(News)
     private newsRepository: Repository<News>,
     private fileService: FilesService,
+    private dormService: DormsService,
+    private userService: UsersService,
     ) {
 
   }
 
-  async createNews(newsDto: CreateNewsDto, image?: Express.Multer.File) {
-    const news = this.newsRepository.create(newsDto);
+  async createNews(newsDto: CreateNewsDto, authorLogin: string, image?: Express.Multer.File) {
+    const {dormId} = newsDto;
+    const dorm = await this.dormService.getById(dormId);
+
+    if(!dorm) {
+      throw new NotFoundException('Dorm doesn`t exist')
+    }
+
+    const author = await this.userService.getByLogin(authorLogin, false);
+
+    if(!author) {
+      throw new NotFoundException('User doesn`t exist')
+    }
+
+    const news = this.newsRepository.create({
+      ...newsDto,
+      author: author,
+      dorm: dorm
+    });
     
     if(!image) {
       return this.newsRepository.save(news);

@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString, IsPhoneNumber } from "class-validator";
+import { IsNotEmpty, IsString, IsPhoneNumber, IsArray } from "class-validator";
 
 export class CreateNewsDto {
   @IsNotEmpty()
@@ -17,5 +17,9 @@ export class CreateNewsDto {
   mainText: string;
 
   @ApiProperty({ type: 'string', format: 'binary', required: false})
-  image: Express.Multer.File
+  image: Express.Multer.File;
+
+  @IsString()
+  @ApiProperty()
+  dormId: string
 }

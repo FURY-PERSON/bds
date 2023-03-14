@@ -1,7 +1,8 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from 'src/users/entities/users.entity';
+import { Dorm } from 'src/dorms/dorms.entity';
 
 @Entity({ name: "news" })
 export class News {
@@ -40,4 +41,8 @@ export class News {
   @UpdateDateColumn()
   @Exclude()
   updatedAt: Date;
+
+  @OneToOne(() => Dorm)
+  @JoinColumn()
+  dorm: Dorm
 }

@@ -13,6 +13,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { PermissionsModule } from './permissions/permissions.module';
 import * as path from 'path';
 import { Permission } from './permissions/permisions.entity';
+import { DormsModule } from './dorms/dorms.module';
 
 @Module({
   controllers: [],
@@ -41,6 +42,7 @@ import { Permission } from './permissions/permisions.entity';
     NewsModule,
     FilesModule,
     PermissionsModule,
+    DormsModule,
   ],
 })
 export class AppModule {
