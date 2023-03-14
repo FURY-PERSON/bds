@@ -1,7 +1,9 @@
 import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Permissions } from 'src/decorators/permissions.decorator';
+import { Roles } from 'src/decorators/roles.decorator';
 import { WithPermission } from 'src/decorators/withPermission';
+import { WithRole } from 'src/decorators/withRoles.decorator';
 import { ClassSerializer } from 'src/serializers/class.serializer';
 import { AddPermissionsDto } from './dto/addPermissions.dto';
 import { AddRolesDto } from './dto/addRoles.dto';
@@ -29,9 +31,9 @@ export class UsersController {
   @ClassSerializer(User)
   @Get('/')
   @ApiResponse({ type: [User] })
-/*   @WithPermission()
-  @Permissions('user', 'worker') */
-/*   @Roles("USER")
+/*   @Permissions('user', 'worker')
+  @WithPermission() */
+/*   @Roles("user")
   @WithRole() */
   getAll() {
     return this.usersService.getAllUsers()
@@ -52,7 +54,7 @@ export class UsersController {
   }
 
   @ClassSerializer(User)
-  @Put('/permission')
+  @Post('/permission')
   @ApiResponse({ type: [User] })
   addPermissions(@Body() addRolesDto: AddPermissionsDto): Promise<User> {
     return this.usersService.addPermissions(addRolesDto)

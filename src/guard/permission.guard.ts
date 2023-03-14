@@ -1,18 +1,18 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException, HttpException, HttpStatus } from "@nestjs/common";
+import { Injectable, CanActivate, ExecutionContext, HttpException, HttpStatus } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-import { JwtService } from "@nestjs/jwt";
 import { PERMISSIONS_KEY } from "src/decorators/permissions.decorator";
+import { UsersService } from "src/users/users.service";
 
 @Injectable()
 export default class PermissionGuard implements CanActivate {
     constructor(
-      private jwtService: JwtService,
-      private reflector: Reflector
+      private reflector: Reflector,
+      private userService: UsersService
     ) {
 
     }
 
-    canActivate(context: ExecutionContext) {
+    async canActivate(context: ExecutionContext) {
       const requiredPermissions = this.reflector.getAllAndOverride<string[]>(PERMISSIONS_KEY, [
         context.getHandler(),
         context.getClass()
@@ -23,18 +23,10 @@ export default class PermissionGuard implements CanActivate {
       }
 
       const request = context.switchToHttp().getRequest();
-
-      const authHeader = request.headers.authorization;
-      const bearer = authHeader?.split(' ')[0];
-      const token = authHeader?.split(' ')[1];
-
-      if(bearer !== 'Bearer' || !token) {
-        throw new UnauthorizedException('User unauthorized')
-      }
+      const {login} = request.user;
+      const user = await this.userService.getByLogin(login);
 
       try {
-        const user = this.jwtService.verify(token);
-        request.user = user;
 
         for(let i=0; i<requiredPermissions.length; i++) {
           if(!user.permissions.some((permission) => {

@@ -90,7 +90,7 @@ export class UsersService {
 
   async addPermissions(addRolesDto: AddPermissionsDto) {
     const user = await this.usersRepository.findOne({
-      where: {id: addRolesDto.userId},
+      where: {login: addRolesDto.login},
       relations: {
         roles: true,
         permissions: true
@@ -101,15 +101,9 @@ export class UsersService {
       new HttpException('User not found', HttpStatus.NOT_FOUND)
     }
 
-    const permissions = await this.permissionService.getAllPermissionsByIds(addRolesDto.permissions);
+    const permissions = await this.permissionService.getAllPermissionsByIds(addRolesDto.permissionsIds);
 
-    addRolesDto.permissions.forEach((roleName) => {
-      if(!permissions.some((role) => role.name === roleName)) {
-        throw new HttpException(`Permission ${roleName} doesn't exist`, HttpStatus.BAD_REQUEST)
-      }
-    })
-
-    const rolesSet = uniqueArray([...user.permissions, ...addRolesDto.permissions]);
+    const rolesSet = uniqueArray([...user.permissions, ...permissions]);
     user.permissions = rolesSet;
 
     return this.usersRepository.save(user)
