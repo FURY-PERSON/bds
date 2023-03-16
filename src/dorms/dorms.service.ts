@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { FilesService } from 'src/files/files.service';
 import { In, Repository } from 'typeorm';
 import { Dorm } from './dorms.entity';
 import { CreateDormDto } from './dto/createDorm.dto';
@@ -10,13 +11,25 @@ export class DormsService {
   constructor(
     @InjectRepository(Dorm)
     private dormRepository: Repository<Dorm>,
+    private fileService: FilesService,
     ) {
 
   }
 
-  async createDorm(dormDto: CreateDormDto) {
-    const dorm = await this.dormRepository.save(dormDto);
-    return dorm;
+  async createDorm(dormDto: CreateDormDto, image?: Express.Multer.File) {
+    const dorm = this.dormRepository.create(dormDto);
+
+    if(!image) {
+      return this.dormRepository.save(dorm)
+    }
+
+    const {fileName, fileUrl} = await this.fileService.createFile(image);
+    if(fileName && fileUrl) {
+      dorm.imageName = fileName;
+      dorm.imageUrl = fileUrl;
+    }
+
+    return this.dormRepository.save(dorm);
   }
 
   async getAllDorms() {
@@ -30,6 +43,7 @@ export class DormsService {
         name: name
       }
     });
+
     return dorm;
   }
 
@@ -51,7 +65,7 @@ export class DormsService {
     return dorm;
   }
 
-  async updateDormByName(id: string, newsDto: UpdateDormDto) {
+  async updateDormByName(id: string, newsDto: UpdateDormDto, image?: Express.Multer.File) {
     const dorm = await this.dormRepository.findOne({
       where: {
         id
@@ -63,6 +77,17 @@ export class DormsService {
     }
 
     const updatedDorm = this.dormRepository.create({...dorm, ...newsDto})
-    return updatedDorm
+
+    if(!image) {
+      return this.dormRepository.save(updatedDorm)
+    }
+
+    const {fileName, fileUrl} = await this.fileService.createFile(image);
+    if(fileName && fileUrl) {
+      dorm.imageName = fileName;
+      dorm.imageUrl = fileUrl;
+    }
+
+    return this.dormRepository.save(dorm);
   }
 }

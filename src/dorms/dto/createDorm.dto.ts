@@ -21,4 +21,7 @@ export class CreateDormDto {
   @IsEmail()
   @ApiProperty()
   email: string
+
+  @ApiProperty({ type: 'string', format: 'binary', required: false})
+  image?: Express.Multer.File;
 }

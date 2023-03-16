@@ -31,4 +31,12 @@ export class Dorm {
   @CreateDateColumn()
   @Exclude()
   createdAt: Date;
+
+  @ApiProperty()
+  @Column({nullable: true})
+  imageName?: string;
+
+  @ApiProperty()
+  @Column({nullable: true})
+  imageUrl?: string;
 }

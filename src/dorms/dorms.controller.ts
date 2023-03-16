@@ -1,5 +1,6 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiConsumes, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ClassSerializer } from 'src/serializers/class.serializer';
 import { Dorm } from './dorms.entity';
 import { DormsService } from './dorms.service';
@@ -17,16 +18,14 @@ export class DormsController {
 
   @ClassSerializer(Dorm)
   @Post('/')
+  @UseInterceptors(FileInterceptor('image'))
+  @ApiConsumes('multipart/form-data')
   @ApiResponse({ type: Dorm })
-  create(@Body() dormDto: CreateDormDto): Promise<CreateDormDto> {
-    return this.dormService.createDorm(dormDto)
-  }
-
-  @ClassSerializer(Dorm)
-  @Get('/')
-  @ApiResponse({ type: [Dorm] })
-  getAll() {
-    return this.dormService.getAllDorms()
+  create(
+    @Body() dormDto: CreateDormDto,
+    @UploadedFile() image?: Express.Multer.File
+    ): Promise<CreateDormDto> {
+    return this.dormService.createDorm(dormDto, image)
   }
 
   @ClassSerializer(Dorm)
@@ -37,11 +36,20 @@ export class DormsController {
   }
 
   @ClassSerializer(Dorm)
-  @Get('/:names')
+  @Get('/')
+  @ApiQuery({
+    name: "names",
+    type: String,
+    required: false
+  })
   @ApiResponse({ type: [Dorm] })
   getAllByNames(
-    @Query('names') names: string[]
+    @Query('names') names?: string[]
     ): Promise<Dorm[]> {
+      if(!names) {
+        return this.dormService.getAllDorms()
+      }
+
       const dormNames = Array.isArray(names) ? names : [names];
     return this.dormService.getAllDormsByName(dormNames)
   }
@@ -49,10 +57,13 @@ export class DormsController {
   @ClassSerializer(Dorm)
   @Put('/:id')
   @ApiResponse({ type: Dorm })
+  @UseInterceptors(FileInterceptor('image'))
+  @ApiConsumes('multipart/form-data')
   updateNews(
     @Body() newsDto: UpdateDormDto,
-    @Param() id: string,
+    @Param('id') id: string,
+    @UploadedFile() image?: Express.Multer.File
   ): Promise<Dorm> {
-    return this.dormService.updateDormByName(id, newsDto)
+    return this.dormService.updateDormByName(id, newsDto, image)
   }
 }
