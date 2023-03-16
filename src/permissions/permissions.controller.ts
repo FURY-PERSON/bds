@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { WithAuth } from 'src/decorators/with-auth.decorator';
 import { ClassSerializer } from 'src/serializers/class.serializer';
 import { CreatePermissionDto } from './dto/createPermission.dto';
@@ -31,11 +31,29 @@ export class PermissionsController {
   }
 
   @ClassSerializer(Permission)
-  @Get('/:ids')
+  @Get('/:id')
   @ApiResponse({ type: [Permission] })
-  getByName(
+  getById(
+    @Param('ids') id: string
+    ): Promise<Permission> {
+      return this.permissionService.getById(id)
+  }
+
+  @ClassSerializer(Permission)
+  @Get('/')
+  @ApiQuery({
+    name: "ids",
+    type: String,
+    required: false
+  })
+  @ApiResponse({ type: [Permission] })
+  getByNames(
     @Query('ids') ids: string[]
     ): Promise<Permission[]> {
+      if(!ids) {
+        return this.permissionService.getAllPermissions()
+      }
+
       const permissionIds = Array.isArray(ids) ? ids : [ids];
     return this.permissionService.getAllPermissionsByIds(permissionIds)
   }

@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Permissions } from 'src/decorators/permissions.decorator';
 import { Roles } from 'src/decorators/roles.decorator';
 import { WithPermission } from 'src/decorators/withPermission';
@@ -30,13 +30,24 @@ export class UsersController {
 
   @ClassSerializer(User)
   @Get('/')
+  @ApiQuery({
+    name: "logins",
+    type: String,
+    required: false
+  })
   @ApiResponse({ type: [User] })
 /*   @Permissions('user', 'worker')
   @WithPermission() */
 /*   @Roles("user")
   @WithRole() */
-  getAll() {
-    return this.usersService.getAllUsers()
+  getAll(
+    @Query('logins') logins?: string[]
+  ) {
+    if(!logins) {
+      return this.usersService.getAllUsers()
+    }
+    const userLogins = Array.isArray(logins) ? logins : [logins];
+    return this.usersService.getAllUsersByLogins(userLogins);
   }
 
   @ClassSerializer(User)

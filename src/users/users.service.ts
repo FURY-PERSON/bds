@@ -4,7 +4,7 @@ import { uniqueArray } from 'src/helpers/uniqueArray';
 import { PermissionsService } from 'src/permissions/permissions.service';
 import { RolesService } from 'src/roles/roles.service';
 import { Roles } from 'src/roles/types';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { AddPermissionsDto } from './dto/addPermissions.dto';
 import { AddRolesDto } from './dto/addRoles.dto';
 import { CreateUserDto } from './dto/createUser.dto';
@@ -35,6 +35,19 @@ export class UsersService {
 
   async getAllUsers() {
     const users = await this.usersRepository.find({
+      relations: {
+        roles: true,
+        permissions: true
+      },
+    });
+    return users;
+  }
+
+  async getAllUsersByLogins(logins: string[]) {
+    const users = await this.usersRepository.find({
+      where: {
+        login: In(logins)
+      },
       relations: {
         roles: true,
         permissions: true
