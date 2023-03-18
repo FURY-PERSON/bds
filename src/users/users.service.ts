@@ -43,14 +43,14 @@ export class UsersService {
     return users;
   }
 
-  async getAllUsersByLogins(logins: string[]) {
+  async getAllUsersByLogins(logins: string[], relations = true) {
     const users = await this.usersRepository.find({
       where: {
         login: In(logins)
       },
       relations: {
-        roles: true,
-        permissions: true
+        roles: relations,
+        permissions: relations
       },
     });
     return users;

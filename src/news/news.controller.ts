@@ -5,6 +5,7 @@ import { WithAuth } from 'src/decorators/with-auth.decorator';
 import { ClassSerializer } from 'src/serializers/class.serializer';
 import { RequestWithUser } from 'src/types/request-with-user.interface';
 import { CreateNewsDto } from './dto/createNews.dto';
+import { UpdateNewsDto } from './dto/updateNews.dto';
 import { News } from './news.entity';
 import { NewsService } from './news.service';
 
@@ -37,7 +38,7 @@ export class NewsController {
   @ApiConsumes('multipart/form-data')
   @ApiResponse({ type: News })
   updateNews(
-    @Body() newsDto: CreateNewsDto,
+    @Body() newsDto: UpdateNewsDto,
     @Param() id: string,
     @UploadedFile() image?: Express.Multer.File
   ): Promise<News> {

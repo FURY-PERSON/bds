@@ -5,6 +5,7 @@ import { FilesService } from 'src/files/files.service';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import { CreateNewsDto } from './dto/createNews.dto';
+import { UpdateNewsDto } from './dto/updateNews.dto';
 import { News } from './news.entity';
 
 @Injectable()
@@ -52,7 +53,7 @@ export class NewsService {
     return this.newsRepository.save(news);
   }
 
-  async updateNews(newsDto: CreateNewsDto, id: string, image?: Express.Multer.File) {
+  async updateNews(newsDto: UpdateNewsDto, id: string, image?: Express.Multer.File) {
     const news = await this.newsRepository.findOne({
       where: { id }
     });
@@ -60,18 +61,20 @@ export class NewsService {
     if(!news) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND)
     }
+    
+    const updatedNews = this.newsRepository.create({...news, ...newsDto}) 
 
     if(!image) {
-      return this.newsRepository.save(news);
+      return this.newsRepository.save(updatedNews);
     }
 
     const {fileName, fileUrl} = await this.fileService.createFile(image);
     if(fileName && fileUrl) {
-      news.imageName = fileName;
-      news.imageUrl = fileUrl;
+      updatedNews.imageName = fileName;
+      updatedNews.imageUrl = fileUrl;
     }
 
-    return this.newsRepository.save(news);
+    return this.newsRepository.save(updatedNews);
   }
 
   async getAll() {

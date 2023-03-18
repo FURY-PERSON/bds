@@ -14,6 +14,7 @@ import { PermissionsModule } from './permissions/permissions.module';
 import * as path from 'path';
 import { Permission } from './permissions/permisions.entity';
 import { DormsModule } from './dorms/dorms.module';
+import { OptModule } from './opt/opt.module';
 
 @Module({
   controllers: [],
@@ -43,6 +44,7 @@ import { DormsModule } from './dorms/dorms.module';
     FilesModule,
     PermissionsModule,
     DormsModule,
+    OptModule,
   ],
 })
 export class AppModule {
