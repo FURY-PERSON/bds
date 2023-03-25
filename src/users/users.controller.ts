@@ -6,7 +6,6 @@ import { WithPermission } from 'src/decorators/withPermission';
 import { WithRole } from 'src/decorators/withRoles.decorator';
 import { ClassSerializer } from 'src/serializers/class.serializer';
 import { AddPermissionsDto } from './dto/addPermissions.dto';
-import { AddRolesDto } from './dto/addRoles.dto';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { User } from './entities/users.entity';
@@ -55,13 +54,6 @@ export class UsersController {
   @ApiResponse({ type: [User] })
   getById(@Param('login') login: string): Promise<User> {
     return this.usersService.getByLogin(login)
-  }
-
-  @ClassSerializer(User)
-  @Post('/role')
-  @ApiResponse({ type: [User] })
-  addRoles(@Body() addRolesDto: AddRolesDto): Promise<User> {
-    return this.usersService.addRoles(addRolesDto)
   }
 
   @ClassSerializer(User)

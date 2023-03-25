@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsNotEmpty, IsString, IsPhoneNumber, Length, ValidateIf } from "class-validator";
+import { IsEmail, IsNotEmpty, IsString, IsPhoneNumber, Length, ValidateIf, IsEnum } from "class-validator";
+import { Roles } from "src/roles/types";
 
 export class UpdateUserDto {
   @ApiProperty()
@@ -25,4 +26,9 @@ export class UpdateUserDto {
   @ApiProperty()
   @ValidateIf(o => o.email)
   refreshToken?: string
+
+  @ApiProperty()
+  @ValidateIf(o => o.role)
+  @IsEnum(Roles)
+  roleName?: Roles
 }
