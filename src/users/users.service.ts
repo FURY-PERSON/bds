@@ -63,7 +63,7 @@ export class UsersService {
       },
       relations: {
         roles: relations,
-        permissions: relations
+        permissions: relations,
       }
     });
     
