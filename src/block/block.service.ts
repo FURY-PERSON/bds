@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DormsService } from 'src/dorms/dorms.service';
 import { In, Repository } from 'typeorm';
 import { CreateBlockDto } from './dto/createBlock.dto';
+import { UpdateBlockDto } from './dto/updateBlock.dto';
 import { Block } from './entities/block.entity';
 
 @Injectable()
@@ -32,16 +33,16 @@ export class BlockService {
     return this.blockRepository.save(block);
   }
 
-  async updateBlock(blockDto: CreateBlockDto, id: string) {
+  async updateBlock(blockDto: UpdateBlockDto, id: string) {
     const block = await this.blockRepository.findOne({
       where: { id }
     });
-
-    const updatedBlock = this.blockRepository.create({...block, ...{number: block.number}}) 
-
+    
     if(!block) {
       throw new HttpException('Block not found', HttpStatus.NOT_FOUND)
     }
+
+    const updatedBlock = this.blockRepository.create({...block, ...{number: block.number}}) 
 
     if(!blockDto.dormId) {
       return this.blockRepository.save(updatedBlock);  

@@ -8,6 +8,7 @@ import { Block } from './entities/block.entity';
 @Module({
   controllers: [BlockController],
   providers: [BlockService],
+  exports: [BlockService],
   imports: [
     TypeOrmModule.forFeature([Block]),
     DormsModule,

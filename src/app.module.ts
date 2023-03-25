@@ -17,6 +17,7 @@ import { DormsModule } from './dorms/dorms.module';
 import { OptModule } from './opt/opt.module';
 import { WatchModule } from './watch/watch.module';
 import { BlockModule } from './block/block.module';
+import { RoomModule } from './room/room.module';
 
 @Module({
   controllers: [],
@@ -49,6 +50,7 @@ import { BlockModule } from './block/block.module';
     OptModule,
     WatchModule,
     BlockModule,
+    RoomModule,
   ],
 })
 export class AppModule {

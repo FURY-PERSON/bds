@@ -1,11 +1,11 @@
 import { Body, Controller, Get, Param, Post, Put, Query, Req, UseInterceptors } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiConsumes, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { WithAuth } from 'src/decorators/with-auth.decorator';
 import { ClassSerializer } from 'src/serializers/class.serializer';
 import { RequestWithUser } from 'src/types/request-with-user.interface';
 import { BlockService } from './block.service';
 import { CreateBlockDto } from './dto/createBlock.dto';
+import { UpdateBlockDto } from './dto/updateBlock.dto';
 import { Block } from './entities/block.entity';
 
 @Controller('block')
@@ -35,10 +35,9 @@ export class BlockController {
     required: false,
   })
   updateBlock(
-    @Body() blockDto: CreateBlockDto,
+    @Body() blockDto: UpdateBlockDto,
     @Param() id: string,
   ): Promise<Block> {
-    console.log('id', id)
     return this.blockService.updateBlock(blockDto, id)
   }
 
@@ -60,9 +59,9 @@ export class BlockController {
   })
   @ApiResponse({ type: [Block] })
   getAllBlocksByIds(
-    @Query() {ids, login}:  {ids?: string[], login?: string}
+    @Query() {ids}:  {ids?: string[]}
     ): Promise<Block[]> {
-      if(!ids && !login) {
+      if(!ids) {
         return this.blockService.getAll()
       }
 
