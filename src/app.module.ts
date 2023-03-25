@@ -16,6 +16,7 @@ import { Permission } from './permissions/permisions.entity';
 import { DormsModule } from './dorms/dorms.module';
 import { OptModule } from './opt/opt.module';
 import { WatchModule } from './watch/watch.module';
+import { BlockModule } from './block/block.module';
 
 @Module({
   controllers: [],
@@ -47,6 +48,7 @@ import { WatchModule } from './watch/watch.module';
     DormsModule,
     OptModule,
     WatchModule,
+    BlockModule,
   ],
 })
 export class AppModule {

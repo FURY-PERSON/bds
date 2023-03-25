@@ -10,11 +10,12 @@ export class ValidationPipe implements PipeTransform<any> {
             return undefined
         }
 
+        if (metadata.type === 'param') {
+            return typeof value === 'object' ? value[Object.keys(value)[0]] : value
+        }
+
         let obj = plainToInstance(metadata.metatype!, value);
 
-        if (metadata.type === 'param') {
-            return obj
-        }
         if (metadata.type === 'query') { 
             return value;
         } 
