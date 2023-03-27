@@ -4,6 +4,7 @@ import { PermissionsService } from 'src/permissions/permissions.service';
 import { In, Repository } from 'typeorm';
 import { CreateRoleDto } from './dto/createRole.dto';
 import { Role } from './roles.entity';
+import { Roles } from './types';
 
 @Injectable()
 export class RolesService {
@@ -17,17 +18,11 @@ export class RolesService {
 
   async createRole(userDto: CreateRoleDto) {
     const user = this.rolesRepository.create(userDto);
-    const permissions = await this.permissionsService.getAllPermissionsByIds(userDto.permissionsIds);
-    user.permissions = permissions;
     return this.rolesRepository.save(user);
   }
 
   async getAllRoles() {
-    const roles = await this.rolesRepository.find({
-      relations: {
-        permissions: true
-      }
-    });
+    const roles = await this.rolesRepository.find();
     return roles;
   }
 
@@ -36,19 +31,13 @@ export class RolesService {
       where: {
         name: In(rolesNames),
       },
-      relations: {
-        permissions: true
-      }
     });
     return roles;
   }
 
-  async getByName(name: string) {
+  async getByName(name: Roles) {
     const role = await this.rolesRepository.findOne({
       where: { name },
-      relations: {
-        permissions: true
-      }
     });
     return role;
   }

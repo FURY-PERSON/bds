@@ -23,12 +23,10 @@ export class UsersService {
 
   async createUser(userDto: CreateUserDto) {
     const user = this.usersRepository.create(userDto);
-
+    
     const userRole = await this.roleService.getByName(userDto.roleName); 
 
-    const roles = userRole
-    user.role = roles;
-    user.permissions = userRole.permissions;
+    user.role = userRole;
 
     return this.usersRepository.save(user);
   }

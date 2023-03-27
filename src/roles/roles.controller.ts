@@ -5,6 +5,7 @@ import { ClassSerializer } from 'src/serializers/class.serializer';
 import { CreateRoleDto } from './dto/createRole.dto';
 import { Role } from './roles.entity';
 import { RolesService } from './roles.service';
+import { Roles } from './types';
 
 @ApiTags('Roles')
 @Controller('roles')
@@ -45,7 +46,7 @@ export class RolesController {
   @Get('/:name')
   @ApiResponse({ type: Role })
   getByName(
-    @Param('name') name: string
+    @Param('name') name: Roles
     ): Promise<Role> {
 
     return this.roleService.getByName(name)

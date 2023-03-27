@@ -17,20 +17,21 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
   async register(createUserDto: CreateUserDto) {
+
     const userExists = await this.usersService.getByLogin(
-      createUserDto.login,
+      createUserDto.login, false
     );
+
     if (userExists) {
       throw new BadRequestException('User already exists');
     }
-
 
     const hash = await this.hashData(createUserDto.password);
     const newUser = await this.usersService.createUser({
       ...createUserDto,
       password: hash,
     });
-
+    
     const tokens = await this.getTokens(newUser.id, newUser.login);
     newUser.refreshToken = tokens.refreshToken;
     await this.usersService.createUser(newUser)

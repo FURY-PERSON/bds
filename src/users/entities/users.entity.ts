@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from 'src/roles/roles.entity';
@@ -47,8 +47,7 @@ export class User {
   })
   email?: string
 
-  @OneToMany(() => Role, (role) => role.name)
-  @JoinColumn()
+  @ManyToOne(() => Role, (role) => role.users)
   role: Role;
 
   @ManyToMany(() => Permission)
