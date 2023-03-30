@@ -30,5 +30,9 @@ export class UpdateUserDto {
   @ApiProperty()
   @ValidateIf(o => o.role)
   @IsEnum(Roles)
-  roleName?: Roles
+  roleName?: Roles;
+
+  @ApiProperty()
+  @ValidateIf(o => o.permissionsIds)
+  permissionsIds?: Roles;
 }

@@ -24,7 +24,6 @@ export class PermissionsController {
 
   @ClassSerializer(Permission)
   @Get('/')
-  @WithAuth()
   @ApiResponse({ type: [Permission] })
   getAll() {
     return this.permissionService.getAllPermissions()

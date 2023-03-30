@@ -58,7 +58,7 @@ export class AuthService {
   }
 
   async refresh(login: string, refreshDto: RefreshDto) {
-    const user = await this.usersService.getByLogin(login);
+    const user = await this.usersService.getByLogin(login, true);
     if (!user) throw new BadRequestException('User does not exist');
 
     if(user.refreshToken !== refreshDto.refreshToken) throw new ForbiddenException('Access denided');

@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { Exclude } from 'class-transformer';
+import { Exclude, Expose, Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from 'src/roles/roles.entity';
 import { Permission } from 'src/permissions/permisions.entity';
@@ -52,6 +52,7 @@ export class User {
 
   @ManyToMany(() => Permission)
   @JoinTable()
+/*   @Transform(({ value }) => value.map(({ name }) => name)) */
   permissions: Permission[];
 
   @Column({nullable: true})

@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { uniqueArray } from 'src/helpers/uniqueArray';
 import { PermissionsService } from 'src/permissions/permissions.service';
@@ -91,15 +91,40 @@ export class UsersService {
   }
 
   async updateByLogin(login: string, userDto: UpdateUserDto) {
-    const user = await this.usersRepository.findOne({where: {
-      login: login
-    }})
+    const user = await this.usersRepository.findOne({
+      where: {
+        login: login
+      },
+      relations: {
+        role: true,
+        permissions: true
+      }
+    })
 
     if(!user) {
       throw new HttpException(`User do not exists`, HttpStatus.BAD_REQUEST)
     }
 
     const updatedUser = this.usersRepository.create({...user, ...userDto})
+
+    if(userDto.roleName && user.role.name !== userDto.roleName) {
+      const newRole = await this.roleService.getByName(userDto.roleName);
+
+      if(!newRole) {
+        throw new NotFoundException(`Role ${userDto.roleName} not found`)
+      }
+
+      updatedUser.role = newRole
+    }
+
+    if(userDto.permissionsIds) {
+      const oldPErmissionsIds = user.permissions?.map((per) => per.id) || []
+      const permissionsIds = Array.from(new Set([...oldPErmissionsIds, userDto.permissionsIds]))
+
+      const newPermissions = await this.permissionService.getAllPermissionsByIds(permissionsIds);
+
+      updatedUser.permissions = newPermissions
+    }
 
     return this.usersRepository.save(updatedUser)
   }
