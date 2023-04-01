@@ -34,5 +34,5 @@ export class UpdateUserDto {
 
   @ApiProperty()
   @ValidateIf(o => o.permissionsIds)
-  permissionsIds?: Roles;
+  permissionsIds?: string[];
 }

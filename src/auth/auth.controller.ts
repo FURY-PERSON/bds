@@ -25,7 +25,7 @@ export class AuthController {
   @ApiBody({
     type: CreateUserDto,
   })
-  create(@Body() userDto: CreateUserDto) {
+  register(@Body() userDto: CreateUserDto) {
     return this.authService.register(userDto)
   }
 

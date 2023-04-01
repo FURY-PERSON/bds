@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { uniqueArray } from 'src/helpers/uniqueArray';
 import { PermissionsService } from 'src/permissions/permissions.service';
@@ -22,13 +22,27 @@ export class UsersService {
   }
 
   async createUser(userDto: CreateUserDto) {
-    const user = this.usersRepository.create(userDto);
-    
+    const user = await this.usersRepository.findOne({
+      where: {
+        login: userDto.login
+      }
+    })
+
+    if(user) {
+      throw new BadRequestException(`User with login ${userDto.login} already exists`)
+    }
+
+    const createdUser =  this.usersRepository.create(userDto);
+
     const userRole = await this.roleService.getByName(userDto.roleName); 
 
-    user.role = userRole;
+    if(!userRole) {
+      throw new NotFoundException(`Role ${userDto.roleName} not found`)
+    }
 
-    return this.usersRepository.save(user);
+    createdUser.role = userRole;
+
+    return this.usersRepository.save(createdUser);
   }
 
   async getAllUsers() {
@@ -118,8 +132,8 @@ export class UsersService {
     }
 
     if(userDto.permissionsIds) {
-      const oldPErmissionsIds = user.permissions?.map((per) => per.id) || []
-      const permissionsIds = Array.from(new Set([...oldPErmissionsIds, userDto.permissionsIds]))
+      const oldPermissionsIds = user.permissions?.map((per) => per.id) || []
+      const permissionsIds = Array.from(new Set([...oldPermissionsIds, ...userDto.permissionsIds]))
 
       const newPermissions = await this.permissionService.getAllPermissionsByIds(permissionsIds);
 

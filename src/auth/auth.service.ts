@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { CreateUserDto } from 'src/users/dto/createUser.dto';
 import { AuthDto } from './dto/auth.dto';
 import { RefreshDto } from './dto/resresh.dto';
+import { Roles } from 'src/roles/types';
 
 @Injectable()
 export class AuthService {
@@ -27,14 +28,18 @@ export class AuthService {
     }
 
     const hash = await this.hashData(createUserDto.password);
+
+    const roleName = createUserDto.roleName || Roles.STUDENT
+
     const newUser = await this.usersService.createUser({
       ...createUserDto,
       password: hash,
+      roleName: roleName
     });
     
     const tokens = await this.getTokens(newUser.id, newUser.login);
     newUser.refreshToken = tokens.refreshToken;
-    await this.usersService.createUser(newUser)
+
     return {
       user: newUser,
       tokens

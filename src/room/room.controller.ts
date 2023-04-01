@@ -63,7 +63,8 @@ export class RoomController {
         return this.roomService.getAll()
       }
 
-    return this.roomService.getByIds(ids)
+    const roomIds = Array.isArray(ids) ? ids : [ids];
+    return this.roomService.getByIds(roomIds)
   }
 
 }

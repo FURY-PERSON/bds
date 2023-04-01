@@ -56,7 +56,8 @@ export class WatchController {
         return this.watchService.getAllWatch()
       }
 
-    return this.watchService.getByIds(ids, login)
+    const watchIds = Array.isArray(ids) ? ids : [ids];
+    return this.watchService.getByIds(watchIds, login)
   }
 
   @ClassSerializer(Watch)

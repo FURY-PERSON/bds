@@ -23,7 +23,7 @@ export class UsersController {
   @ClassSerializer(User)
   @Post('/')
   @ApiResponse({ type: User })
-  create(@Body() userDto: CreateUserDto): Promise<CreateUserDto> {
+  create(@Body() userDto: CreateUserDto): Promise<User> {
     return this.usersService.createUser(userDto)
   }
 
@@ -32,7 +32,8 @@ export class UsersController {
   @ApiQuery({
     name: "logins",
     type: String,
-    required: false
+    required: false,
+    isArray: true
   })
   @ApiResponse({ type: [User] })
 /*   @Permissions('user', 'worker')
@@ -45,27 +46,28 @@ export class UsersController {
     if(!logins) {
       return this.usersService.getAllUsers()
     }
+
     const userLogins = Array.isArray(logins) ? logins : [logins];
     return this.usersService.getAllUsersByLogins(userLogins);
   }
 
   @ClassSerializer(User)
   @Get('/:login')
-  @ApiResponse({ type: [User] })
+  @ApiResponse({ type: User })
   getById(@Param('login') login: string): Promise<User> {
     return this.usersService.getByLogin(login)
   }
 
   @ClassSerializer(User)
   @Post('/permission')
-  @ApiResponse({ type: [User] })
+  @ApiResponse({ type: User })
   addPermissions(@Body() addRolesDto: AddPermissionsDto): Promise<User> {
     return this.usersService.addPermissions(addRolesDto)
   }
 
   @ClassSerializer(User)
   @Put('/:login')
-  @ApiResponse({ type: [User] })
+  @ApiResponse({ type: User })
   updateUser(
     @Param('login') login: string,
     @Body() userDto: UpdateUserDto

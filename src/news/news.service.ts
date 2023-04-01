@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DormsService } from 'src/dorms/dorms.service';
 import { FilesService } from 'src/files/files.service';
 import { UsersService } from 'src/users/users.service';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreateNewsDto } from './dto/createNews.dto';
 import { UpdateNewsDto } from './dto/updateNews.dto';
 import { News } from './news.entity';
@@ -78,6 +78,37 @@ export class NewsService {
   }
 
   async getAll() {
-    return this.newsRepository.find()
+    return this.newsRepository.find({
+      relations: {
+        author: true,
+      },
+    })
   }
+
+  async getAllNewsByIds(ids: string[], relations = true) {
+    const news = await this.newsRepository.find({
+      where: {
+        id: In(ids)
+      },
+      relations: {
+        author: relations,
+      },
+    });
+    return news;
+  }
+
+  async getById(id: string, relations = true) {
+    const news = await this.newsRepository.findOne({
+      where: {
+        id: id
+      },
+      relations: {
+        author: relations,
+      }
+    });
+    
+    return news;
+  }
+
+  
 }

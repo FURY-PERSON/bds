@@ -23,13 +23,6 @@ export class PermissionsController {
   }
 
   @ClassSerializer(Permission)
-  @Get('/')
-  @ApiResponse({ type: [Permission] })
-  getAll() {
-    return this.permissionService.getAllPermissions()
-  }
-
-  @ClassSerializer(Permission)
   @Get('/:id')
   @ApiResponse({ type: [Permission] })
   getById(
@@ -43,7 +36,8 @@ export class PermissionsController {
   @ApiQuery({
     name: "ids",
     type: String,
-    required: false
+    required: false,
+    isArray: true
   })
   @ApiResponse({ type: [Permission] })
   getByNames(
@@ -53,7 +47,7 @@ export class PermissionsController {
         return this.permissionService.getAllPermissions()
       }
 
-      const permissionIds = Array.isArray(ids) ? ids : [ids];
+    const permissionIds = Array.isArray(ids) ? ids : [ids];
     return this.permissionService.getAllPermissionsByIds(permissionIds)
   }
 }

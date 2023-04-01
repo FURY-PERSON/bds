@@ -65,7 +65,8 @@ export class BlockController {
         return this.blockService.getAll()
       }
 
-    return this.blockService.getByIds(ids)
+    const blockIds = Array.isArray(ids) ? ids : [ids];
+    return this.blockService.getByIds(blockIds)
   }
 
 }

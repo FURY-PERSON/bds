@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Param, Post, Put, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { WithAuth } from 'src/decorators/with-auth.decorator';
 import { ClassSerializer } from 'src/serializers/class.serializer';
 import { RequestWithUser } from 'src/types/request-with-user.interface';
@@ -47,8 +47,28 @@ export class NewsController {
 
   @ClassSerializer(News)
   @Get('/')
+  @ApiQuery({
+    name: "ids",
+    type: String,
+    required: false,
+    isArray: true
+  })
   @ApiResponse({ type: [News] })
-  getAll(): Promise<News[]> {
-    return this.newsService.getAll()
+  getAll(
+    @Query('ids') ids?: string[]
+  ): Promise<News[]> {
+    if(!ids) {
+      return this.newsService.getAll()
+    }
+
+    const newsIds = Array.isArray(ids) ? ids : [ids];
+    return this.newsService.getAllNewsByIds(newsIds);
+  }
+
+  @ClassSerializer(News)
+  @Get('/:id')
+  @ApiResponse({ type: News })
+  getById(@Param('id') login: string): Promise<News> {
+    return this.newsService.getById(login)
   }
 }

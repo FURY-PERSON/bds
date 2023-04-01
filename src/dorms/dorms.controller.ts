@@ -40,7 +40,8 @@ export class DormsController {
   @ApiQuery({
     name: "names",
     type: String,
-    required: false
+    required: false,
+    isArray: true
   })
   @ApiResponse({ type: [Dorm] })
   getAllByNames(
@@ -50,7 +51,7 @@ export class DormsController {
         return this.dormService.getAllDorms()
       }
 
-      const dormNames = Array.isArray(names) ? names : [names];
+    const dormNames = Array.isArray(names) ? names : [names];
     return this.dormService.getAllDormsByName(dormNames)
   }
 
