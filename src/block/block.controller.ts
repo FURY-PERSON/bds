@@ -1,8 +1,7 @@
-import { Body, Controller, Get, Param, Post, Put, Query, Req, UseInterceptors } from '@nestjs/common';
-import { ApiConsumes, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { WithAuth } from 'src/decorators/with-auth.decorator';
 import { ClassSerializer } from 'src/serializers/class.serializer';
-import { RequestWithUser } from 'src/types/request-with-user.interface';
 import { BlockService } from './block.service';
 import { CreateBlockDto } from './dto/createBlock.dto';
 import { UpdateBlockDto } from './dto/updateBlock.dto';
@@ -19,6 +18,7 @@ export class BlockController {
 
   @ClassSerializer(Block)
   @Post('/')
+  @WithAuth()
   @ApiResponse({ type: Block })
   createBlock(
     @Body() newsDto: CreateBlockDto,
@@ -28,6 +28,7 @@ export class BlockController {
 
   @ClassSerializer(Block)
   @Put('/:id')
+  @WithAuth()
   @ApiResponse({ type: Block })
   @ApiParam({
     name: "id",
@@ -44,6 +45,7 @@ export class BlockController {
 
   @ClassSerializer(Block)
   @Get('/:id')
+  @WithAuth()
   @ApiResponse({ type: Block })
   getBlockById(@Param('id') name: string): Promise<Block> {
     return this.blockService.getById(name)
@@ -51,6 +53,7 @@ export class BlockController {
 
   @ClassSerializer(Block)
   @Get('/')
+  @WithAuth()
   @ApiQuery({
     name: "ids",
     type: String,

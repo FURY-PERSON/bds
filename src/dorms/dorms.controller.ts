@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiConsumes, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { WithAuth } from 'src/decorators/with-auth.decorator';
 import { ClassSerializer } from 'src/serializers/class.serializer';
 import { Dorm } from './dorms.entity';
 import { DormsService } from './dorms.service';
@@ -18,6 +19,7 @@ export class DormsController {
 
   @ClassSerializer(Dorm)
   @Post('/')
+  @WithAuth()
   @UseInterceptors(FileInterceptor('image'))
   @ApiConsumes('multipart/form-data')
   @ApiResponse({ type: Dorm })
@@ -31,6 +33,7 @@ export class DormsController {
   @ClassSerializer(Dorm)
   @Get('/:name')
   @ApiResponse({ type: Dorm })
+  @WithAuth()
   getByName(@Param('name') name: string): Promise<Dorm> {
     return this.dormService.getByName(name)
   }
@@ -43,6 +46,7 @@ export class DormsController {
     required: false,
     isArray: true
   })
+  @WithAuth()
   @ApiResponse({ type: [Dorm] })
   getAllByNames(
     @Query('names') names?: string[]
@@ -58,6 +62,7 @@ export class DormsController {
   @ClassSerializer(Dorm)
   @Put('/:id')
   @ApiResponse({ type: Dorm })
+  @WithAuth()
   @UseInterceptors(FileInterceptor('image'))
   @ApiConsumes('multipart/form-data')
   updateNews(

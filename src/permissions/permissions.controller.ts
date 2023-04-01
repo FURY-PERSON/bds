@@ -17,6 +17,7 @@ export class PermissionsController {
   
   @ClassSerializer(Permission)
   @Post('/')
+  @WithAuth()
   @ApiResponse({ type: Permission })
   create(@Body() userDto: CreatePermissionDto): Promise<CreatePermissionDto> {
     return this.permissionService.createPermission(userDto)
@@ -24,6 +25,7 @@ export class PermissionsController {
 
   @ClassSerializer(Permission)
   @Get('/:id')
+  @WithAuth()
   @ApiResponse({ type: [Permission] })
   getById(
     @Param('ids') id: string
@@ -33,6 +35,7 @@ export class PermissionsController {
 
   @ClassSerializer(Permission)
   @Get('/')
+  @WithAuth()
   @ApiQuery({
     name: "ids",
     type: String,

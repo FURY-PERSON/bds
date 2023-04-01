@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { WithAuth } from 'src/decorators/with-auth.decorator';
 import { ClassSerializer } from 'src/serializers/class.serializer';
 import { CreateOptDto } from './dto/createOpt.dto';
 import { UpdateOptDto } from './dto/updateOpt.dto';
@@ -18,6 +19,7 @@ export class OptController {
 
   @ClassSerializer(Opt)
   @Post('/')
+  @WithAuth()
   @ApiResponse({ type: Opt })
   create(@Body() optDto: CreateOptDto): Promise<Opt> {
     return this.optService.createOpt(optDto)
@@ -25,6 +27,7 @@ export class OptController {
 
   @ClassSerializer(Opt)
   @Get('/:id')
+  @WithAuth()
   @ApiResponse({ type: Opt })
   getById(@Param('id') name: string): Promise<Opt> {
     return this.optService.getById(name)
@@ -35,8 +38,10 @@ export class OptController {
   @ApiQuery({
     name: "ids",
     type: String,
-    required: false
+    required: false,
+    isArray: true
   })
+  @WithAuth()
   @ApiResponse({ type: [Opt] })
   getAllByIds(
     @Query('ids') ids?: string[]
@@ -50,6 +55,7 @@ export class OptController {
   }
 
   @ClassSerializer(Opt)
+  @WithAuth()
   @Put('/:id')
   @ApiResponse({ type: Opt })
   updateNews(

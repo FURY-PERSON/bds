@@ -30,6 +30,7 @@ export class WatchController {
 
   @ClassSerializer(Watch)
   @Get('/:id')
+  @WithAuth()
   @ApiResponse({ type: Watch })
   getById(@Param('id') name: string): Promise<Watch> {
     return this.watchService.getById(name)
@@ -37,6 +38,7 @@ export class WatchController {
 
   @ClassSerializer(Watch)
   @Get('/')
+  @WithAuth()
   @ApiQuery({
     name: "ids",
     type: String,
@@ -62,6 +64,7 @@ export class WatchController {
 
   @ClassSerializer(Watch)
   @Put('/:id')
+  @WithAuth()
   @ApiResponse({ type: Watch })
   updateNews(
     @Body() updateDto: UpdateWatchDto,

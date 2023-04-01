@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Permissions } from 'src/decorators/permissions.decorator';
 import { Roles } from 'src/decorators/roles.decorator';
+import { WithAuth } from 'src/decorators/with-auth.decorator';
 import { WithPermission } from 'src/decorators/withPermission';
 import { WithRole } from 'src/decorators/withRoles.decorator';
 import { ClassSerializer } from 'src/serializers/class.serializer';
@@ -22,6 +23,7 @@ export class UsersController {
 
   @ClassSerializer(User)
   @Post('/')
+  @WithAuth()
   @ApiResponse({ type: User })
   create(@Body() userDto: CreateUserDto): Promise<User> {
     return this.usersService.createUser(userDto)
@@ -29,6 +31,7 @@ export class UsersController {
 
   @ClassSerializer(User)
   @Get('/')
+  @WithAuth()
   @ApiQuery({
     name: "logins",
     type: String,
@@ -53,6 +56,7 @@ export class UsersController {
 
   @ClassSerializer(User)
   @Get('/:login')
+  @WithAuth()
   @ApiResponse({ type: User })
   getById(@Param('login') login: string): Promise<User> {
     return this.usersService.getByLogin(login)
@@ -60,6 +64,7 @@ export class UsersController {
 
   @ClassSerializer(User)
   @Post('/permission')
+  @WithAuth()
   @ApiResponse({ type: User })
   addPermissions(@Body() addRolesDto: AddPermissionsDto): Promise<User> {
     return this.usersService.addPermissions(addRolesDto)
@@ -67,6 +72,7 @@ export class UsersController {
 
   @ClassSerializer(User)
   @Put('/:login')
+  @WithAuth()
   @ApiResponse({ type: User })
   updateUser(
     @Param('login') login: string,

@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Post, Put, Query, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiConsumes, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { WithAuth } from 'src/decorators/with-auth.decorator';
 import { ClassSerializer } from 'src/serializers/class.serializer';
 import { RequestWithUser } from 'src/types/request-with-user.interface';
@@ -36,6 +36,7 @@ export class NewsController {
   @Put('/:id')
   @UseInterceptors(FileInterceptor('image'))
   @ApiConsumes('multipart/form-data')
+  @WithAuth()
   @ApiResponse({ type: News })
   updateNews(
     @Body() newsDto: UpdateNewsDto,
@@ -53,6 +54,7 @@ export class NewsController {
     required: false,
     isArray: true
   })
+  @WithAuth()
   @ApiResponse({ type: [News] })
   getAll(
     @Query('ids') ids?: string[]
@@ -67,6 +69,7 @@ export class NewsController {
 
   @ClassSerializer(News)
   @Get('/:id')
+  @WithAuth()
   @ApiResponse({ type: News })
   getById(@Param('id') login: string): Promise<News> {
     return this.newsService.getById(login)

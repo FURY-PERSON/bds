@@ -18,6 +18,7 @@ export class RolesController {
   
   @ClassSerializer(Role)
   @Post('/')
+  @WithAuth()
   @ApiResponse({ type: Role })
   create(@Body() roleDto: CreateRoleDto): Promise<Role> {
     return this.roleService.createRole(roleDto)
@@ -25,10 +26,12 @@ export class RolesController {
 
   @ClassSerializer(Role)
   @Get('/')
+  @WithAuth()
   @ApiQuery({
     name: "names",
     type: String,
-    required: false
+    required: false,
+    isArray: true
   })
   @ApiResponse({ type: [Role] })
   getByNames(
@@ -44,6 +47,7 @@ export class RolesController {
 
   @ClassSerializer(Role)
   @Get('/:name')
+  @WithAuth()
   @ApiResponse({ type: Role })
   getByName(
     @Param('name') name: Roles

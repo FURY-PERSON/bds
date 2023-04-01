@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { WithAuth } from 'src/decorators/with-auth.decorator';
 import { ClassSerializer } from 'src/serializers/class.serializer';
 import { CreateRoomDto } from './dto/createRoom.dto';
 import { UpdateRoomDto } from './dto/updateRoom.dto';
@@ -17,6 +18,7 @@ export class RoomController {
 
   @ClassSerializer(Room)
   @Post('/')
+  @WithAuth()
   @ApiResponse({ type: Room })
   createRoom(
     @Body() newsDto: CreateRoomDto,
@@ -26,6 +28,7 @@ export class RoomController {
 
   @ClassSerializer(Room)
   @Put('/:id')
+  @WithAuth()
   @ApiResponse({ type: Room })
   @ApiParam({
     name: "id",
@@ -42,6 +45,7 @@ export class RoomController {
 
   @ClassSerializer(Room)
   @Get('/:id')
+  @WithAuth()
   @ApiResponse({ type: Room })
   getRoomById(@Param('id') name: string): Promise<Room> {
     return this.roomService.getById(name)
@@ -49,6 +53,7 @@ export class RoomController {
 
   @ClassSerializer(Room)
   @Get('/')
+  @WithAuth()
   @ApiQuery({
     name: "ids",
     type: String,
