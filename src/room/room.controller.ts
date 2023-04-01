@@ -1,6 +1,8 @@
 import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Permissions } from 'src/decorators/permissions.decorator';
 import { WithAuth } from 'src/decorators/with-auth.decorator';
+import { WithPermission } from 'src/decorators/withPermission';
 import { ClassSerializer } from 'src/serializers/class.serializer';
 import { CreateRoomDto } from './dto/createRoom.dto';
 import { UpdateRoomDto } from './dto/updateRoom.dto';
@@ -18,7 +20,8 @@ export class RoomController {
 
   @ClassSerializer(Room)
   @Post('/')
-  @WithAuth()
+  @Permissions('admin')
+  @WithPermission()
   @ApiResponse({ type: Room })
   createRoom(
     @Body() newsDto: CreateRoomDto,

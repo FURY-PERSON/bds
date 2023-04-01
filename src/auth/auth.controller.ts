@@ -41,13 +41,11 @@ export class AuthController {
 
   @ClassSerializer(User)
   @Post('/refresh')
-  @WithAuth()
   @ApiResponse({ type: AuthResponseDto })
   refresh(
-    @Req() { user }: RequestWithUser,
     @Body() resfreshDto: RefreshDto
   ) {
-    return this.authService.refresh(user.login, resfreshDto)
+    return this.authService.refresh(resfreshDto)
   }
 
 }

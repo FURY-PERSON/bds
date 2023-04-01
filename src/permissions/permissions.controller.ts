@@ -17,7 +17,6 @@ export class PermissionsController {
   
   @ClassSerializer(Permission)
   @Post('/')
-  @WithAuth()
   @ApiResponse({ type: Permission })
   create(@Body() userDto: CreatePermissionDto): Promise<CreatePermissionDto> {
     return this.permissionService.createPermission(userDto)

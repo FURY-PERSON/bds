@@ -5,9 +5,9 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from './pipes/validation.pipe';
 
 export let app: INestApplication;
+export const PORT = process.env.PORT || 3000;
 
 async function bootstrap() {
-  const PORT = process.env.PORT || 3000;
   app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
   app.useGlobalPipes(new ValidationPipe());

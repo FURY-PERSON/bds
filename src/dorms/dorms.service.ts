@@ -84,10 +84,10 @@ export class DormsService {
 
     const {fileName, fileUrl} = await this.fileService.createFile(image);
     if(fileName && fileUrl) {
-      dorm.imageName = fileName;
-      dorm.imageUrl = fileUrl;
+      updatedDorm.imageName = fileName;
+      updatedDorm.imageUrl = fileUrl;
     }
 
-    return this.dormRepository.save(dorm);
+    return this.dormRepository.save(updatedDorm);
   }
 }

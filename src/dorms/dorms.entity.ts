@@ -1,6 +1,8 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { Block } from 'src/block/entities/block.entity';
+import { News } from 'src/news/news.entity';
 
 @Entity({ name: "dorm" })
 export class Dorm {
@@ -39,4 +41,10 @@ export class Dorm {
   @ApiProperty()
   @Column({nullable: true})
   imageUrl?: string;
+
+  @OneToMany(() => Block, block => block.dorm)
+  block: Block[]
+
+  @OneToMany(() => News, news => news.dorm)
+  news: News[]
 }

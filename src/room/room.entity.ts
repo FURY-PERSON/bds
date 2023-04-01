@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
 import { Block } from 'src/block/entities/block.entity';
@@ -7,10 +7,6 @@ import { Block } from 'src/block/entities/block.entity';
 export class Room {
   @PrimaryGeneratedColumn("uuid")
   id: string;
-
-  @OneToOne(() => Block)
-  @JoinColumn()
-  block:Block
 
   @ApiProperty()
   @Column()
@@ -21,4 +17,7 @@ export class Room {
   @Column()
   @IsNotEmpty()
   subNumber: string;
+
+  @ManyToOne(() => Block, block => block.rooms)
+  block:Block
 }

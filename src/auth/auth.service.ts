@@ -62,7 +62,9 @@ export class AuthService {
     };
   }
 
-  async refresh(login: string, refreshDto: RefreshDto) {
+  async refresh(refreshDto: RefreshDto) {
+    const login = (this.jwtService.decode(refreshDto.accessToken) as any)!.login
+
     const user = await this.usersService.getByLogin(login, true);
     if (!user) throw new BadRequestException('User does not exist');
 

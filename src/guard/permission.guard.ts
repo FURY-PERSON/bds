@@ -1,4 +1,4 @@
-import { Injectable, CanActivate, ExecutionContext, HttpException, HttpStatus } from "@nestjs/common";
+import { Injectable, CanActivate, ExecutionContext, HttpException, HttpStatus, ForbiddenException } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { PERMISSIONS_KEY } from "src/decorators/permissions.decorator";
 import { UsersService } from "src/users/users.service";
@@ -31,12 +31,14 @@ export default class PermissionGuard implements CanActivate {
         for(let i=0; i<requiredPermissions.length; i++) {
           if(!user.permissions.some((permission) => {
             return permission.name === requiredPermissions[i]
-          })) return false
+          })) {
+            throw new ForbiddenException('Not enought permissions')
+          }
         }
 
         return true
       } catch(error) {
-        throw new HttpException('Access denied', HttpStatus.FORBIDDEN)
+        throw new ForbiddenException('Not enought permissions')
       }
     }
 }
