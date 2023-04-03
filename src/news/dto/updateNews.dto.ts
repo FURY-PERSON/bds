@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, ValidateIf } from "class-validator";
+import { IsEnum, IsNotEmpty, ValidateIf } from "class-validator";
+import { NewsBlock, NewsType } from "../types/types";
 
 export class UpdateNewsDto {
   @ApiProperty({required: false})
@@ -20,4 +21,16 @@ export class UpdateNewsDto {
   @ApiProperty({required: false})
   @ValidateIf(o => o.dormId)
   dormId?: string
+
+  @ApiProperty({
+    type: String,
+    example: '[{"type":"image","src":"src","title":"sdfsdf"},{"type":"text","title":"title","paragraphs":["paragraphs1","sdfsdf2"]},{"type":"code","code":"code"}]'
+  })
+  @ValidateIf(o => o.blocks)
+  blocks: Array<NewsBlock>
+
+  @ApiProperty()
+  @ValidateIf(o => o.type)
+  @IsEnum(NewsType)
+  type:NewsType;
 }

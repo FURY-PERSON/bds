@@ -1,8 +1,11 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from 'src/users/entities/users.entity';
 import { Dorm } from 'src/dorms/dorms.entity';
+import { NewsBlock, NewsType } from '../types/types';
+import { IsEnum } from 'class-validator';
+import { NewsBlockBase } from './newsBlockBase.entity';
 
 @Entity({ name: "news" })
 export class News {
@@ -34,13 +37,22 @@ export class News {
 
   @Column()
   @CreateDateColumn()
-  @Exclude()
   createdAt: Date;
 
   @UpdateDateColumn()
   @Exclude()
   updatedAt: Date;
 
+  @ApiProperty()
+  @Column()
+  @IsEnum(NewsType)
+  type:NewsType;
+
   @ManyToOne(() => Dorm, dorm => dorm.news)
-  dorm: Dorm
+  @JoinColumn()
+  dorm: Dorm;
+
+  @OneToMany(() => NewsBlockBase, blocks => blocks.news)
+  @JoinColumn()
+  blocks: Array<NewsBlock>
 }

@@ -7,7 +7,7 @@ import { RolesModule } from './roles/roles.module';
 import { Role } from './roles/roles.entity';
 import { AuthModule } from './auth/auth.module';
 import { NewsModule } from './news/news.module';
-import { News } from './news/news.entity';
+import { News } from './news/entities/news.entity';
 import { FilesModule } from './files/files.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { PermissionsModule } from './permissions/permissions.module';
@@ -18,6 +18,10 @@ import { OptModule } from './opt/opt.module';
 import { WatchModule } from './watch/watch.module';
 import { BlockModule } from './block/block.module';
 import { RoomModule } from './room/room.module';
+import { NewsCodeBlock } from './news/entities/newsCodeBlock.entity';
+import { NewsTextBlock } from './news/entities/newsTextBlock.entity';
+import { NewsImageBlock } from './news/entities/newsImageBlock.entity';
+import { NewsBlockBase } from './news/entities/newsBlockBase.entity';
 
 @Module({
   controllers: [],
@@ -36,7 +40,7 @@ import { RoomModule } from './room/room.module';
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
-      entities: [User, Role, News, Permission],
+      entities: [User, Role, News, Permission, NewsCodeBlock, NewsTextBlock, NewsImageBlock, NewsBlockBase],
       autoLoadEntities: true,
       synchronize: true,
     }),

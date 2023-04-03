@@ -2,7 +2,7 @@ import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, Up
 import { Exclude } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { Block } from 'src/block/entities/block.entity';
-import { News } from 'src/news/news.entity';
+import { News } from 'src/news/entities/news.entity';
 
 @Entity({ name: "dorm" })
 export class Dorm {

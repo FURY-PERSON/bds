@@ -6,7 +6,7 @@ import { ClassSerializer } from 'src/serializers/class.serializer';
 import { RequestWithUser } from 'src/types/request-with-user.interface';
 import { CreateNewsDto } from './dto/createNews.dto';
 import { UpdateNewsDto } from './dto/updateNews.dto';
-import { News } from './news.entity';
+import { News } from './entities/news.entity';
 import { NewsService } from './news.service';
 
 @ApiTags('News')
@@ -29,7 +29,13 @@ export class NewsController {
     @Req() { user }: RequestWithUser,
     @UploadedFile() image?: Express.Multer.File
   ): Promise<News> {
-    return this.newsService.createNews(newsDto, user.login, image)
+    let blocks = newsDto.blocks 
+    if(blocks && typeof blocks === 'string') {
+      const parsedBlocks = JSON.parse(blocks);
+      blocks = Array.isArray(parsedBlocks) ? parsedBlocks : [parsedBlocks]
+    }
+    
+    return this.newsService.createNews({...newsDto, blocks: blocks}, user.login, image)
   }
 
   @ClassSerializer(News)

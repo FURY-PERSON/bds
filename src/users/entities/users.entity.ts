@@ -1,14 +1,13 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { Exclude, Expose, Transform } from 'class-transformer';
+import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Exclude } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from 'src/roles/roles.entity';
 import { Permission } from 'src/permissions/permisions.entity';
-import { News } from 'src/news/news.entity';
+import { News } from 'src/news/entities/news.entity';
 
 @Entity({ name: "user" })
 export class User {
   @PrimaryGeneratedColumn("uuid")
-  @Exclude()
   id: string;
 
   @ApiProperty()

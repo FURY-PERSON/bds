@@ -6,13 +6,23 @@ import { UsersService } from 'src/users/users.service';
 import { In, Repository } from 'typeorm';
 import { CreateNewsDto } from './dto/createNews.dto';
 import { UpdateNewsDto } from './dto/updateNews.dto';
-import { News } from './news.entity';
+import { News } from './entities/news.entity';
+import { NewsCodeBlock } from './entities/newsCodeBlock.entity';
+import { NewsImageBlock } from './entities/newsImageBlock.entity';
+import { NewsTextBlock } from './entities/newsTextBlock.entity';
+import { NewsBlock, NewsBlockType } from './types/types';
 
 @Injectable()
 export class NewsService {
   constructor(
     @InjectRepository(News)
     private newsRepository: Repository<News>,
+    @InjectRepository(NewsCodeBlock)
+    private newsCodeBlockRepository: Repository<NewsCodeBlock>,
+    @InjectRepository(NewsImageBlock)
+    private newsCodeImageRepository: Repository<NewsImageBlock>,
+    @InjectRepository(NewsTextBlock)
+    private newsTextBlockRepository: Repository<NewsTextBlock>,
     private fileService: FilesService,
     private dormService: DormsService,
     private userService: UsersService,
@@ -34,17 +44,23 @@ export class NewsService {
       throw new NotFoundException('User doesn`t exist')
     }
 
-    const news = this.newsRepository.create({
+    const news = await this.newsRepository.save({
       ...newsDto,
       author: author,
-      dorm: dorm
+      dorm: dorm,
+      blocks: undefined
     });
-
     
+    newsDto.blocks.forEach(async (block) => {
+      news.blocks = []
+      block.news = news;
+      const blockEntity = await this.createNewsBlock(block)
+      news.blocks.push(blockEntity)
+    })
     if(!image) {
       return this.newsRepository.save(news);
     }
-
+    
     const {fileName, fileUrl} = await this.fileService.createFile(image);
     if(fileName && fileUrl) {
       news.imageName = fileName;
@@ -63,7 +79,14 @@ export class NewsService {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND)
     }
     
-    const updatedNews = this.newsRepository.create({...news, ...newsDto}) 
+    const updatedNews = await this.newsRepository.save({...news, ...newsDto}) 
+
+    newsDto.blocks.forEach(async (block) => {
+      updatedNews.blocks = []
+      block.news = updatedNews;
+      const blockEntity = await this.createNewsBlock(block)
+      updatedNews.blocks.push(blockEntity)
+    })
 
     if(!image) {
       return this.newsRepository.save(updatedNews);
@@ -82,6 +105,7 @@ export class NewsService {
     return this.newsRepository.find({
       relations: {
         author: true,
+        blocks: true
       },
     })
   }
@@ -93,6 +117,7 @@ export class NewsService {
       },
       relations: {
         author: relations,
+        blocks: relations
       },
     });
     return news;
@@ -105,11 +130,26 @@ export class NewsService {
       },
       relations: {
         author: relations,
+        blocks: relations
       }
     });
     
     return news;
   }
 
-  
+  private async createNewsBlock(block: NewsBlock) {
+    switch(block.type) {
+      case NewsBlockType.CODE: {
+        return await this.newsCodeBlockRepository.save(block)
+      }
+      case NewsBlockType.IMAGE: {
+        return await this.newsCodeImageRepository.save(block)
+      }
+      case NewsBlockType.TEXT: {
+        console.log(block)
+        return await this.newsTextBlockRepository.save(block)
+      }
+    }
+
+  }
 }
