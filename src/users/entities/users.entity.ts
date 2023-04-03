@@ -3,6 +3,7 @@ import { Exclude, Expose, Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from 'src/roles/roles.entity';
 import { Permission } from 'src/permissions/permisions.entity';
+import { News } from 'src/news/news.entity';
 
 @Entity({ name: "user" })
 export class User {
@@ -58,4 +59,7 @@ export class User {
   @Column({nullable: true})
   @Exclude()
   refreshToken?: string
+
+  @OneToMany(() => News, news => news.author)
+  news: News
 }

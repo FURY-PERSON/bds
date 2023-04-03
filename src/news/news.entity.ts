@@ -29,8 +29,7 @@ export class News {
   @Column({nullable: true})
   imageUrl?: string;
 
-  @OneToOne(() => User)
-  @JoinColumn()
+  @ManyToOne(() => User, user => user.news)
   author: User
 
   @Column()
@@ -42,7 +41,6 @@ export class News {
   @Exclude()
   updatedAt: Date;
 
-  @ManyToOne(() => Dorm, dorm => dorm.id)
-  @JoinColumn({name: 'id'})
+  @ManyToOne(() => Dorm, dorm => dorm.news)
   dorm: Dorm
 }

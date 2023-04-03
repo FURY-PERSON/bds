@@ -39,6 +39,7 @@ export class NewsService {
       author: author,
       dorm: dorm
     });
+
     
     if(!image) {
       return this.newsRepository.save(news);
