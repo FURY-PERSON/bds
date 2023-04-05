@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Param, Post, Put, Query, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiConsumes, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { WithAuth } from 'src/decorators/with-auth.decorator';
 import { ClassSerializer } from 'src/serializers/class.serializer';
 import { RequestWithUser } from 'src/types/request-with-user.interface';
@@ -40,6 +40,9 @@ export class NewsController {
 
   @ClassSerializer(News)
   @Put('/:id')
+  @ApiParam({
+    name: 'id',
+  })
   @UseInterceptors(FileInterceptor('image'))
   @ApiConsumes('multipart/form-data')
   @WithAuth()
@@ -79,5 +82,17 @@ export class NewsController {
   @ApiResponse({ type: News })
   getById(@Param('id') login: string): Promise<News> {
     return this.newsService.getById(login)
+  }
+
+  @Delete('/:id')
+  @WithAuth()
+  @ApiParam({
+    name: 'id',
+  })
+  @ApiResponse({ type: News })
+  deleteComment(
+    @Param() id: string,
+  ): Promise<News> {
+    return this.newsService.deleteById(id)
   }
 }

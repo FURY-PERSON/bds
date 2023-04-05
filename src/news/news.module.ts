@@ -21,6 +21,9 @@ import { NewsBlockBase } from './entities/newsBlockBase.entity';
     TypeOrmModule.forFeature([News, NewsCodeBlock, NewsTextBlock, NewsImageBlock, NewsBlockBase]),
     DormsModule,
     UsersModule
+  ],
+  exports: [
+    NewsService
   ]
 })
 export class NewsModule {}

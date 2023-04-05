@@ -137,6 +137,18 @@ export class NewsService {
     return news;
   }
 
+  async deleteById(id: string) {
+    const news = await this.newsRepository.findOne({
+      where: { id }
+    });
+
+    if(!news) {
+      throw new NotFoundException(`News id: ${id} not found`)
+    }
+
+    return await this.newsRepository.remove(news)
+  }
+
   private async createNewsBlock(block: NewsBlock) {
     switch(block.type) {
       case NewsBlockType.CODE: {
@@ -146,7 +158,6 @@ export class NewsService {
         return await this.newsCodeImageRepository.save(block)
       }
       case NewsBlockType.TEXT: {
-        console.log(block)
         return await this.newsTextBlockRepository.save(block)
       }
     }

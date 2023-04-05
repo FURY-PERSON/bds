@@ -22,6 +22,7 @@ import { NewsCodeBlock } from './news/entities/newsCodeBlock.entity';
 import { NewsTextBlock } from './news/entities/newsTextBlock.entity';
 import { NewsImageBlock } from './news/entities/newsImageBlock.entity';
 import { NewsBlockBase } from './news/entities/newsBlockBase.entity';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   controllers: [],
@@ -55,6 +56,7 @@ import { NewsBlockBase } from './news/entities/newsBlockBase.entity';
     WatchModule,
     BlockModule,
     RoomModule,
+    CommentModule,
   ],
 })
 export class AppModule {

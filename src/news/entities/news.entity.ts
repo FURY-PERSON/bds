@@ -6,6 +6,7 @@ import { Dorm } from 'src/dorms/dorms.entity';
 import { NewsBlock, NewsType } from '../types/types';
 import { IsEnum } from 'class-validator';
 import { NewsBlockBase } from './newsBlockBase.entity';
+import { Comment } from 'src/comment/comment.entity';
 
 @Entity({ name: "news" })
 export class News {
@@ -55,4 +56,8 @@ export class News {
   @OneToMany(() => NewsBlockBase, blocks => blocks.news)
   @JoinColumn()
   blocks: Array<NewsBlock>
+
+  @OneToMany(() => Comment, comment => comment.news)
+  @JoinColumn()
+  comments: Array<Comment>
 }

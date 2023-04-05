@@ -4,6 +4,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Role } from 'src/roles/roles.entity';
 import { Permission } from 'src/permissions/permisions.entity';
 import { News } from 'src/news/entities/news.entity';
+import { Comment } from 'src/comment/comment.entity';
 
 @Entity({ name: "user" })
 export class User {
@@ -61,4 +62,13 @@ export class User {
 
   @OneToMany(() => News, news => news.author)
   news: News
+
+  @OneToMany(() => Comment, comment => comment.author)
+  comments?: Comment[]
+
+  @OneToMany(() => Comment, comment => comment.likers)
+  likers: Comment
+
+  @OneToMany(() => Comment, comment => comment.dislikers)
+  dislikers: Comment
 }
