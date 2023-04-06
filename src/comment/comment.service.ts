@@ -74,6 +74,20 @@ export class CommentService {
     return comment;
   }
 
+  async getAllCommentByNewsIds(newsId: string, relations = true) {
+    const comment = await this.commentRepository.find({
+      where: {
+        news: {
+          id: newsId
+        }
+      },
+      relations: {
+        author: relations,
+      },
+    });
+    return comment;
+  }
+
   async getById(id: string, relations = true) {
     const comment = await this.commentRepository.findOne({
       where: {

@@ -68,8 +68,16 @@ export class CommentController {
   @Get('/:id')
   @WithAuth()
   @ApiResponse({ type: Comment })
-  getById(@Param('id') login: string): Promise<Comment> {
-    return this.commentService.getById(login)
+  getById(@Param('id') id: string): Promise<Comment> {
+    return this.commentService.getById(id)
+  }
+
+  @ClassSerializer(Comment)
+  @Get('/news/:id')
+  @WithAuth()
+  @ApiResponse({ type: Comment })
+  getAllByNewsId(@Param('id') id: string): Promise<Comment[]> {
+    return this.commentService.getAllCommentByNewsIds(id)
   }
 
   @Delete('/:id')
