@@ -9,12 +9,12 @@ export class Comment {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @ApiProperty()
-  @Column()
+  @ApiProperty({nullable: true})
+  @Column({nullable: true})
   title: string;
 
-  @ApiProperty()
-  @Column()
+  @ApiProperty({nullable: true})
+  @Column({nullable: true})
   subTitle: string;
 
   @ApiProperty()

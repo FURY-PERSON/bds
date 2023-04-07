@@ -2,15 +2,13 @@ import { ApiProperty } from "@nestjs/swagger";
 import { IsNotEmpty, IsString, IsNumber, ValidateIf } from "class-validator";
 
 export class CreateCommentDto {
-  @IsNotEmpty()
   @IsString()
   @ApiProperty()
-  title: string;
+  title?: string;
 
-  @IsNotEmpty()
   @IsString()
   @ApiProperty()
-  subTitle: string;
+  subTitle?: string;
 
   @IsString()
   @ApiProperty()
