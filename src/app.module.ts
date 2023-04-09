@@ -29,7 +29,7 @@ import { CommentModule } from './comment/comment.module';
   providers: [],
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: path.resolve(__dirname, 'static'),
+      rootPath: path.resolve(__dirname,  '..', 'static'),
     }),
     ConfigModule.forRoot({
       envFilePath: `.${process.env.NODE_ENV}.env`
