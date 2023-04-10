@@ -84,8 +84,9 @@ export class NewsController {
     ): Promise<News[]> {
     if(!ids) {
       const {result, total, totalPage} = await this.newsService.getAll({page, limit})
-      res.set({'x-total-item': total })
-      res.set({'x-total-page': totalPage})
+      res.set({'X-Total-Item': total })
+      res.set({'X-Current-Page': page })
+      res.set({'X-Total-Page': totalPage})
       res.send(result)
 
     }

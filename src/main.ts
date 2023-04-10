@@ -8,8 +8,11 @@ export let app: INestApplication;
 export const PORT = process.env.PORT || 3000;
 
 async function bootstrap() {
-  app = await NestFactory.create(AppModule);
+  app = await NestFactory.create(AppModule, {cors: true});
   app.setGlobalPrefix('api');
+  app.enableCors({
+    exposedHeaders: '*'
+  });
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors();
   app.useGlobalInterceptors(
