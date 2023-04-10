@@ -119,7 +119,14 @@ export class UsersService {
       throw new HttpException(`User do not exists`, HttpStatus.BAD_REQUEST)
     }
 
-    const updatedUser = this.usersRepository.create({...user, ...userDto})
+    const updatedUser = this.usersRepository.create({
+      ...user,
+      firstName: userDto.firstName ?? user.firstName,
+      lastName: userDto.lastName ?? user.lastName,
+      phone: userDto.phone ?? user.phone,
+      email: userDto.email ?? user.email,
+      refreshToken: userDto.refreshToken ?? user.refreshToken,
+    })
 
     if(userDto.roleName && user.role.name !== userDto.roleName) {
       const newRole = await this.roleService.getByName(userDto.roleName);

@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestj
 import { InjectRepository } from '@nestjs/typeorm';
 import { DormsService } from 'src/dorms/dorms.service';
 import { FilesService } from 'src/files/files.service';
+import { QueryParam } from 'src/types/queryParam';
 import { UsersService } from 'src/users/users.service';
 import { In, Repository } from 'typeorm';
 import { CreateNewsDto } from './dto/createNews.dto';
@@ -101,13 +102,27 @@ export class NewsService {
     return this.newsRepository.save(updatedNews);
   }
 
-  async getAll() {
-    return this.newsRepository.find({
+  async getAll(query: QueryParam) {
+    const take = query.limit || 20
+    const page = query.page || 1;
+    const skip = (page-1) * take ;
+
+    const [result, total] = await this.newsRepository.findAndCount({
       relations: {
         author: true,
         blocks: true
       },
+      take: take,
+      skip: skip
     })
+
+    const totalPage = Math.ceil(total / take)
+
+    return {
+      result, 
+      total,
+      totalPage
+    }
   }
 
   async getAllNewsByIds(ids: string[], relations = true) {

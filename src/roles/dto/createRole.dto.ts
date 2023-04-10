@@ -12,9 +12,4 @@ export class CreateRoleDto {
   @IsString()
   @ApiProperty()
   description: string;
-
-  @IsNotEmpty()
-  @IsArray()
-  @ApiProperty()
-  permissionsIds: string[]
 }

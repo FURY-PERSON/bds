@@ -49,7 +49,14 @@ export class CommentService {
       throw new NotFoundException(`Comment id: ${comment} not found`)
     }
     
-    const updatedComment = await this.commentRepository.save({...comment, ...commentDto}) 
+    const updatedComment = this.commentRepository.create({
+      ...comment,
+      title: commentDto.title ?? comment.title,
+      subTitle: commentDto.subTitle ?? comment.subTitle,
+      mainText: commentDto.mainText ?? comment.mainText,
+      rating: commentDto.rating ?? comment.rating,
+    }) 
+ 
 
     return this.commentRepository.save(updatedComment);
   }

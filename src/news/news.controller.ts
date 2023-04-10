@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, Response, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiConsumes, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { WithAuth } from 'src/decorators/with-auth.decorator';
@@ -8,6 +8,7 @@ import { CreateNewsDto } from './dto/createNews.dto';
 import { UpdateNewsDto } from './dto/updateNews.dto';
 import { News } from './entities/news.entity';
 import { NewsService } from './news.service';
+import { Response as Res } from 'express';
 
 @ApiTags('News')
 @Controller('news')
@@ -61,17 +62,33 @@ export class NewsController {
     name: "ids",
     type: String,
     required: false,
-    isArray: true
+    isArray: true,
+  })
+  @ApiQuery({
+    name: "page",
+    type: Number,
+    required: false,
+  })
+  @ApiQuery({
+    name: "limit",
+    type: Number,
+    required: false,
   })
   @WithAuth()
   @ApiResponse({ type: [News] })
-  getAll(
-    @Query('ids') ids?: string[]
-  ): Promise<News[]> {
+  async getAll(
+    @Query('ids') ids?: string[],
+    @Query('page') page?:  number,
+    @Query('limit') limit?: number,
+    @Response() res?: Res
+    ): Promise<News[]> {
     if(!ids) {
-      return this.newsService.getAll()
-    }
+      const {result, total, totalPage} = await this.newsService.getAll({page, limit})
+      res.set({'x-total-item': total })
+      res.set({'x-total-page': totalPage})
+      res.send(result)
 
+    }
     const newsIds = Array.isArray(ids) ? ids : [ids];
     return this.newsService.getAllNewsByIds(newsIds);
   }

@@ -42,7 +42,10 @@ export class BlockService {
       throw new HttpException('Block not found', HttpStatus.NOT_FOUND)
     }
 
-    const updatedBlock = this.blockRepository.create({...block, ...{number: block.number}}) 
+    const updatedBlock = this.blockRepository.create({
+      ...block,
+      number: blockDto.number ?? block.number
+    }) 
 
     if(!blockDto.dormId) {
       return this.blockRepository.save(updatedBlock);  
