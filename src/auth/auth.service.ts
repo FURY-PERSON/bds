@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { UsersService } from 'src/users/users.service';
 import * as argon2 from 'argon2';
@@ -81,6 +81,15 @@ export class AuthService {
       tokens
     };
   }
+
+  async getProfile(login: string) {
+    const user = await this.usersService.getByLogin(login)
+
+    if (!user) throw new NotFoundException('User does not exist');
+
+    return user
+  }
+
 
 	async logout(login: string) {
     return this.usersService.updateByLogin(login, { refreshToken: null });

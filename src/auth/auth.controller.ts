@@ -48,4 +48,14 @@ export class AuthController {
     return this.authService.refresh(resfreshDto)
   }
 
+  @ClassSerializer(User)
+  @Get('/profile')
+  @WithAuth()
+  @ApiResponse({ type: AuthResponseDto })
+  getProifile(
+    @Req() { user }: RequestWithUser,
+  ) {
+    return this.authService.getProfile(user.login)
+  }
+
 }
