@@ -1,8 +1,10 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Block } from 'src/block/entities/block.entity';
 import { DormsService } from 'src/dorms/dorms.service';
 import { FilesService } from 'src/files/files.service';
 import { QueryParam } from 'src/types/queryParam';
+import { User } from 'src/users/entities/users.entity';
 import { UsersService } from 'src/users/users.service';
 import { In, Repository } from 'typeorm';
 import { CreateNewsDto } from './dto/createNews.dto';
@@ -11,7 +13,7 @@ import { News } from './entities/news.entity';
 import { NewsCodeBlock } from './entities/newsCodeBlock.entity';
 import { NewsImageBlock } from './entities/newsImageBlock.entity';
 import { NewsTextBlock } from './entities/newsTextBlock.entity';
-import { NewsBlock, NewsBlockType } from './types/types';
+import { GetAllNewsParam, NewsBlock, NewsBlockType } from './types/types';
 
 @Injectable()
 export class NewsService {
@@ -102,21 +104,47 @@ export class NewsService {
     return this.newsRepository.save(updatedNews);
   }
 
-  async getAll(query: QueryParam) {
-    const take = query.limit || 20
-    const page = query.page || 1;
-    const skip = (page-1) * take ;
+  async getAll(query: GetAllNewsParam) {
+    const take = query.limit
+    const page = query.page;
+    const title = query.title;
+    const orderBy = query.orderBy;
+    const sort = 'news.' + query.sort;
 
-    const [result, total] = await this.newsRepository.findAndCount({
-      relations: {
-        author: true,
-        blocks: true
-      },
-      take: take,
-      skip: skip
-    })
+    const createdQuery = this.newsRepository.createQueryBuilder('news')
+      .leftJoin('news.author', 'author')
+      .leftJoin('news.dorm', 'dorm')
+      .leftJoin('news.blocks', 'blocks')
+      .leftJoin('news.comments', 'comments')
+      .select([
+        'news.id',
+        'news.title',
+        'news.subTitle',
+        'news.mainText',
+        'news.imageName',
+        'news.imageUrl',
+        'news.createdAt',
+        'news.type',
+        'author',
+        'dorm',
+        'blocks',
+        'comments',
+      ])
+      .where('news.title ILIKE :title', {title: `%${title}%`})
 
-    const totalPage = Math.ceil(total / take)
+      .orderBy(sort, orderBy)
+      ;
+
+      if(take && page) {
+        const skip = (page-1) * take ;
+        createdQuery      
+          .take(take)
+          .skip(skip)
+      }
+
+    const [result, total] = await  createdQuery.getManyAndCount()
+
+    const totalPage = take && Math.ceil(total / take)
 
     return {
       result, 
@@ -128,7 +156,7 @@ export class NewsService {
   async getAllNewsByIds(ids: string[], relations = true) {
     const news = await this.newsRepository.find({
       where: {
-        id: In(ids)
+        id: In(ids),
       },
       relations: {
         author: relations,

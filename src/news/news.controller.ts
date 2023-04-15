@@ -74,24 +74,45 @@ export class NewsController {
     type: Number,
     required: false,
   })
+  @ApiQuery({
+    name: "title",
+    type: String,
+    required: false,
+  })
+  @ApiQuery({
+    name: "sort",
+    type: String,
+    required: false,
+  })
+  @ApiQuery({
+    name: "orderBy",
+    type: String,
+    required: false,
+  })
   @WithAuth()
   @ApiResponse({ type: [News] })
   async getAll(
     @Query('ids') ids?: string[],
-    @Query('page') page?:  number,
+    @Query('page') page?: number,
     @Query('limit') limit?: number,
+    @Query('orderBy') orderBy: 'DESC' | 'ASC' = 'DESC',
+    @Query('sort') sort: "title" | "createdAt" = 'title',
+    @Query('title') title: string = '',
     @Response() res?: Res
     ): Promise<News[]> {
-    if(!ids) {
-      const {result, total, totalPage} = await this.newsService.getAll({page, limit})
-      res.set({'X-Total-Item': total })
-      res.set({'X-Current-Page': page })
-      res.set({'X-Total-Page': totalPage})
-      res.send(result)
-
+    if(ids) {
+      const newsIds = Array.isArray(ids) ? ids : [ids];
+      const news = await this.newsService.getAllNewsByIds(newsIds);
+      res.send(news)
+      return news
     }
-    const newsIds = Array.isArray(ids) ? ids : [ids];
-    return this.newsService.getAllNewsByIds(newsIds);
+
+    const {result, total, totalPage} = await this.newsService.getAll({page, limit, orderBy, sort, title})
+    res.set({'X-Total-Item': total })
+    res.set({'X-Current-Page': page })
+    res.set({'X-Total-Page': totalPage})
+    res.send(result)
+    return result
   }
 
   @ClassSerializer(News)
