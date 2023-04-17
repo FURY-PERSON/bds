@@ -12,11 +12,13 @@ export enum NewsBlockType {
 export type NewsBlock = NewsImageBlock | NewsTextBlock | NewsCodeBlock
 
 export enum NewsType {
-  WARNING = 'warning'
+  WARNING = 'warning',
+  ALL = 'all'
 }
 
 export interface GetAllNewsParam extends QueryParam {
   title?: string;
   orderBy?: "DESC" | "ASC";
-  sort?: 'createdAt' | 'title'
+  sort?: 'createdAt' | 'title',
+  type?: NewsType
 }

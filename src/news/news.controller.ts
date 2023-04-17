@@ -9,6 +9,7 @@ import { UpdateNewsDto } from './dto/updateNews.dto';
 import { News } from './entities/news.entity';
 import { NewsService } from './news.service';
 import { Response as Res } from 'express';
+import { NewsType } from './types/types';
 
 @ApiTags('News')
 @Controller('news')
@@ -85,6 +86,11 @@ export class NewsController {
     required: false,
   })
   @ApiQuery({
+    name: "type",
+    type: String,
+    required: false,
+  })
+  @ApiQuery({
     name: "orderBy",
     type: String,
     required: false,
@@ -95,6 +101,7 @@ export class NewsController {
     @Query('ids') ids?: string[],
     @Query('page') page?: number,
     @Query('limit') limit?: number,
+    @Query('type') type?: NewsType,
     @Query('orderBy') orderBy: 'DESC' | 'ASC' = 'DESC',
     @Query('sort') sort: "title" | "createdAt" = 'title',
     @Query('title') title: string = '',
@@ -107,7 +114,7 @@ export class NewsController {
       return news
     }
 
-    const {result, total, totalPage} = await this.newsService.getAll({page, limit, orderBy, sort, title})
+    const {result, total, totalPage} = await this.newsService.getAll({page, limit, orderBy, sort, title, type})
     res.set({'X-Total-Item': total })
     res.set({'X-Current-Page': page })
     res.set({'X-Total-Page': totalPage})

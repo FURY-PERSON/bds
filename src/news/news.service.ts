@@ -13,7 +13,7 @@ import { News } from './entities/news.entity';
 import { NewsCodeBlock } from './entities/newsCodeBlock.entity';
 import { NewsImageBlock } from './entities/newsImageBlock.entity';
 import { NewsTextBlock } from './entities/newsTextBlock.entity';
-import { GetAllNewsParam, NewsBlock, NewsBlockType } from './types/types';
+import { GetAllNewsParam, NewsBlock, NewsBlockType, NewsType } from './types/types';
 
 @Injectable()
 export class NewsService {
@@ -109,6 +109,7 @@ export class NewsService {
     const page = query.page;
     const title = query.title;
     const orderBy = query.orderBy;
+    const type = query.type;
     const sort = 'news.' + query.sort;
 
     const createdQuery = this.newsRepository.createQueryBuilder('news')
@@ -131,9 +132,11 @@ export class NewsService {
         'comments',
       ])
       .where('news.title ILIKE :title', {title: `%${title}%`})
+      .orderBy(sort, orderBy);
 
-      .orderBy(sort, orderBy)
-      ;
+      if(type && type !== NewsType.ALL) {
+        createdQuery.andWhere('news.type LIKE :type', {type: `%${type}%`})
+      }
 
       if(take && page) {
         const skip = (page-1) * take ;
