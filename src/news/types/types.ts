@@ -4,9 +4,9 @@ import { NewsImageBlock } from "../entities/newsImageBlock.entity";
 import { NewsTextBlock } from "../entities/newsTextBlock.entity";
 
 export enum NewsBlockType {
-  IMAGE = 'image',
-  TEXT = 'text',
-  CODE = 'code'
+  IMAGE = 'NewsImageBlock',
+  TEXT = 'NewsTextBlock',
+  CODE = 'NewsCodeBlock'
 }
 
 export type NewsBlock = NewsImageBlock | NewsTextBlock | NewsCodeBlock
@@ -14,7 +14,7 @@ export type NewsBlock = NewsImageBlock | NewsTextBlock | NewsCodeBlock
 export enum NewsType {
   WARNING = 'warning',
   ALL = 'all'
-}
+} 
 
 export interface GetAllNewsParam extends QueryParam {
   title?: string;

@@ -8,7 +8,7 @@ export class NewsImageBlock  extends NewsBlockBase {
 
   @ApiProperty()
   @Column()
-  src: string;
+  image: string;
 
   @ApiProperty()
   @Column()

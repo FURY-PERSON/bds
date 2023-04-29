@@ -1,10 +1,7 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Block } from 'src/block/entities/block.entity';
 import { DormsService } from 'src/dorms/dorms.service';
-import { FilesService } from 'src/files/files.service';
-import { QueryParam } from 'src/types/queryParam';
-import { User } from 'src/users/entities/users.entity';
+import { FilesService } from 'src/files/files.service';;
 import { UsersService } from 'src/users/users.service';
 import { In, Repository } from 'typeorm';
 import { CreateNewsDto } from './dto/createNews.dto';
@@ -23,7 +20,7 @@ export class NewsService {
     @InjectRepository(NewsCodeBlock)
     private newsCodeBlockRepository: Repository<NewsCodeBlock>,
     @InjectRepository(NewsImageBlock)
-    private newsCodeImageRepository: Repository<NewsImageBlock>,
+    private newsImageBlockRepository: Repository<NewsImageBlock>,
     @InjectRepository(NewsTextBlock)
     private newsTextBlockRepository: Repository<NewsTextBlock>,
     private fileService: FilesService,
@@ -47,19 +44,20 @@ export class NewsService {
       throw new NotFoundException('User doesn`t exist')
     }
 
-    const news = await this.newsRepository.save({
+    const news = await this.newsRepository.create({
       ...newsDto,
       author: author,
       dorm: dorm,
       blocks: undefined
     });
-    
-    newsDto.blocks.forEach(async (block) => {
-      news.blocks = []
-      block.news = news;
-      const blockEntity = await this.createNewsBlock(block)
+
+    news.blocks = []
+
+    for(let i =0; i<newsDto.blocks.length; i++) {
+      const blockEntity = await this.createNewsBlock(newsDto.blocks[i])
       news.blocks.push(blockEntity)
-    })
+    }
+
     if(!image) {
       return this.newsRepository.save(news);
     }
@@ -79,17 +77,35 @@ export class NewsService {
     });
 
     if(!news) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND)
+      throw new HttpException('News not found', HttpStatus.NOT_FOUND)
     }
-    
-    const updatedNews = await this.newsRepository.save({...news, ...newsDto}) 
 
-    newsDto.blocks.forEach(async (block) => {
+    const updatedNews = this.newsRepository.create({
+      ...news,
+      mainText: newsDto.mainText ?? news.mainText,
+      subTitle: newsDto.subTitle ?? news.subTitle,
+      title: newsDto.title ?? news.title,
+    }) 
+
+    if(newsDto.blocks) {
       updatedNews.blocks = []
-      block.news = updatedNews;
-      const blockEntity = await this.createNewsBlock(block)
-      updatedNews.blocks.push(blockEntity)
-    })
+  
+      for(let i =0; i<newsDto.blocks.length; i++) {
+        const blockEntity = await this.createNewsBlock(newsDto.blocks[i])
+        updatedNews.blocks.push(blockEntity)
+      }
+    }
+
+    if(newsDto.dormId) {
+      const dorm = await this.dormService.getById(newsDto.dormId)
+
+      if(!dorm) {
+        throw new HttpException(`Dorm ${newsDto.dormId} not found`, HttpStatus.NOT_FOUND)
+      }
+
+      updatedNews.dorm = dorm
+    }
+
 
     if(!image) {
       return this.newsRepository.save(updatedNews);
@@ -106,7 +122,7 @@ export class NewsService {
 
   async getAll(query: GetAllNewsParam) {
     const take = query.limit
-    const page = query.page;
+    const page = query.page || 1;
     const title = query.title;
     const orderBy = query.orderBy;
     const type = query.type;
@@ -195,17 +211,17 @@ export class NewsService {
     return await this.newsRepository.remove(news)
   }
 
-  private async createNewsBlock(block: NewsBlock) {
-    switch(block.type) {
-      case NewsBlockType.CODE: {
-        return await this.newsCodeBlockRepository.save(block)
-      }
-      case NewsBlockType.IMAGE: {
-        return await this.newsCodeImageRepository.save(block)
-      }
-      case NewsBlockType.TEXT: {
-        return await this.newsTextBlockRepository.save(block)
-      }
+  private async createNewsBlock(block: NewsBlock, fileUrl?: string) {
+    if(block.type === NewsBlockType.CODE) {
+      return await this.newsCodeBlockRepository.save(block)
+    }
+    if(block.type === NewsBlockType.IMAGE) {
+      block = block as NewsImageBlock
+      block.image = 'http://localhost:3005/764c6d28-0ff2-43f8-aecc-7b3d4fc2b352.jpg'
+      return await this.newsImageBlockRepository.save(block)
+    }
+    if(block.type === NewsBlockType.TEXT) {
+      return await this.newsTextBlockRepository.save(block)
     }
 
   }

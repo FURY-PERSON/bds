@@ -54,7 +54,12 @@ export class NewsController {
     @Param() id: string,
     @UploadedFile() image?: Express.Multer.File
   ): Promise<News> {
-    return this.newsService.updateNews(newsDto, id, image)
+    let blocks = newsDto.blocks 
+    if(blocks && typeof blocks === 'string') {
+      const parsedBlocks = JSON.parse(blocks);
+      blocks = Array.isArray(parsedBlocks) ? parsedBlocks : [parsedBlocks]
+    }
+    return this.newsService.updateNews({...newsDto, blocks: blocks}, id, image)
   }
 
   @ClassSerializer(News)
