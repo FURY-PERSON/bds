@@ -192,7 +192,8 @@ export class NewsService {
       },
       relations: {
         author: relations,
-        blocks: relations
+        blocks: relations,
+        dorm: relations
       }
     });
     

@@ -11,6 +11,9 @@ export abstract class NewsBlockBase {
   @Column()
   type: NewsBlockType
 
+  @Column()
+  sequenceNumber: number
+
   @ManyToOne(() => News, news => news.blocks)
   news: News
 }
