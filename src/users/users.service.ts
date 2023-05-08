@@ -9,6 +9,7 @@ import { AddPermissionsDto } from './dto/addPermissions.dto';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { User } from './entities/users.entity';
+import { GetAllUsersParam } from './types/types';
 
 @Injectable()
 export class UsersService {
@@ -45,14 +46,50 @@ export class UsersService {
     return this.usersRepository.save(createdUser);
   }
 
-  async getAllUsers() {
-    const users = await this.usersRepository.find({
-      relations: {
-        role: true,
-        permissions: true
-      },
-    });
-    return users;
+  async getAllUsers(query: GetAllUsersParam) {
+    const take = query.limit
+    const page = query.page || 1;
+    const loginSearch = query.login;
+    const orderBy = query.orderBy;
+    const roleName = query.role;
+    const sort = 'user.' + query.sort;
+
+    const createdQuery = this.usersRepository.createQueryBuilder('user')
+      .leftJoin('user.role', 'role')
+      .leftJoin('user.permissions', 'permissions')
+      .select([
+        'user.id',
+        'user.firstName',
+        'user.lastName',
+        'user.phone',
+        'user.login',
+        'user.email',
+        'role',
+        'permissions',
+      ])
+      .where('user.login ILIKE :login', {login: `%${loginSearch}%`})
+      .orderBy(sort, orderBy);
+
+      if(roleName) {
+        createdQuery.andWhere('user.role.name LIKE :roleName', {roleName: `%${roleName}%`})
+      }
+
+      if(take && page) {
+        const skip = (page-1) * take ;
+        createdQuery      
+          .take(take)
+          .skip(skip)
+      }
+
+    const [result, total] = await  createdQuery.getManyAndCount()
+
+    const totalPage = take && Math.ceil(total / take)
+
+    return {
+      result, 
+      total,
+      totalPage
+    }
   }
 
   async getAllUsersByLogins(logins: string[], relations = true) {

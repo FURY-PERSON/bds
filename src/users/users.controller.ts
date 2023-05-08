@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, Response } from '@nestjs/common';
 import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Permissions } from 'src/decorators/permissions.decorator';
 import { Roles } from 'src/decorators/roles.decorator';
@@ -11,6 +11,8 @@ import { CreateUserDto } from './dto/createUser.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { User } from './entities/users.entity';
 import { UsersService } from './users.service';
+import { Roles as RoleNames } from 'src/roles/types';
+import { Response as Res } from 'express';
 
 @ApiTags('User')
 @Controller('users')
@@ -38,20 +40,65 @@ export class UsersController {
     required: false,
     isArray: true
   })
+  @ApiQuery({
+    name: "page",
+    type: Number,
+    required: false,
+  })
+  @ApiQuery({
+    name: "limit",
+    type: Number,
+    required: false,
+  })
+  @ApiQuery({
+    name: "login",
+    type: String,
+    required: false,
+  })
+  @ApiQuery({
+    name: "sort",
+    type: String,
+    required: false,
+  })
+  @ApiQuery({
+    name: "role",
+    type: String,
+    required: false,
+  })
+  @ApiQuery({
+    name: "orderBy",
+    type: String,
+    required: false,
+  })
   @ApiResponse({ type: [User] })
 /*   @Permissions('user', 'worker')
   @WithPermission() */
 /*   @Roles("user")
   @WithRole() */
-  getAll(
-    @Query('logins') logins?: string[]
+  async getAll(
+    @Query('logins') logins?: string[],
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+    @Query('orderBy') orderBy: 'DESC' | 'ASC' = 'DESC',
+    @Query('login') login: string = '',
+    @Query('sort') sort: "login" | "firstName" | "lastName" = 'login',
+    @Query('role') role?: RoleNames,
+    @Response() res?: Res
   ) {
-    if(!logins) {
-      return this.usersService.getAllUsers()
+
+    if(logins) {
+      const usersLogin = Array.isArray(logins) ? logins : [logins];
+      const users = await this.usersService.getAllUsersByLogins(usersLogin);
+      res.send(users)
+      return users
     }
 
-    const userLogins = Array.isArray(logins) ? logins : [logins];
-    return this.usersService.getAllUsersByLogins(userLogins);
+    const {result, total, totalPage} = await this.usersService.getAllUsers({page, limit, orderBy, role, login, sort})
+    res.set({'X-Total-Item': total })
+    res.set({'X-Current-Page': page })
+    res.set({'X-Total-Page': totalPage})
+    res.send(result)
+    return result
   }
 
   @ClassSerializer(User)
