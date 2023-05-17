@@ -25,7 +25,7 @@ export class AuthController {
   @ApiBody({
     type: CreateUserDto,
   })
-  create(@Body() userDto: CreateUserDto) {
+  register(@Body() userDto: CreateUserDto) {
     return this.authService.register(userDto)
   }
 
@@ -41,13 +41,21 @@ export class AuthController {
 
   @ClassSerializer(User)
   @Post('/refresh')
-  @WithAuth()
   @ApiResponse({ type: AuthResponseDto })
   refresh(
-    @Req() { user }: RequestWithUser,
     @Body() resfreshDto: RefreshDto
   ) {
-    return this.authService.refresh(user.login, resfreshDto)
+    return this.authService.refresh(resfreshDto)
+  }
+
+  @ClassSerializer(User)
+  @Get('/profile')
+  @WithAuth()
+  @ApiResponse({ type: AuthResponseDto })
+  getProifile(
+    @Req() { user }: RequestWithUser,
+  ) {
+    return this.authService.getProfile(user.login)
   }
 
 }

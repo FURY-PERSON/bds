@@ -5,11 +5,14 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from './pipes/validation.pipe';
 
 export let app: INestApplication;
+export const PORT = process.env.PORT || 3000;
 
 async function bootstrap() {
-  const PORT = process.env.PORT || 3000;
-  app = await NestFactory.create(AppModule);
+  app = await NestFactory.create(AppModule, {cors: true});
   app.setGlobalPrefix('api');
+  app.enableCors({
+    exposedHeaders: '*'
+  });
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors();
   app.useGlobalInterceptors(

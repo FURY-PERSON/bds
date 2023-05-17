@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 
 import { UsersService } from 'src/users/users.service';
 import * as argon2 from 'argon2';
@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { CreateUserDto } from 'src/users/dto/createUser.dto';
 import { AuthDto } from './dto/auth.dto';
 import { RefreshDto } from './dto/resresh.dto';
+import { Roles } from 'src/roles/types';
 
 @Injectable()
 export class AuthService {
@@ -17,23 +18,28 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
   async register(createUserDto: CreateUserDto) {
+
     const userExists = await this.usersService.getByLogin(
-      createUserDto.login,
+      createUserDto.login, false
     );
+
     if (userExists) {
       throw new BadRequestException('User already exists');
     }
 
-
     const hash = await this.hashData(createUserDto.password);
+
+    const roleName = createUserDto.roleName || Roles.STUDENT
+
     const newUser = await this.usersService.createUser({
       ...createUserDto,
       password: hash,
+      roleName: roleName
     });
-
+    
     const tokens = await this.getTokens(newUser.id, newUser.login);
     newUser.refreshToken = tokens.refreshToken;
-    await this.usersService.createUser(newUser)
+
     return {
       user: newUser,
       tokens
@@ -56,8 +62,10 @@ export class AuthService {
     };
   }
 
-  async refresh(login: string, refreshDto: RefreshDto) {
-    const user = await this.usersService.getByLogin(login);
+  async refresh(refreshDto: RefreshDto) {
+    const login = (this.jwtService.decode(refreshDto.accessToken) as any)!.login
+
+    const user = await this.usersService.getByLogin(login, true);
     if (!user) throw new BadRequestException('User does not exist');
 
     if(user.refreshToken !== refreshDto.refreshToken) throw new ForbiddenException('Access denided');
@@ -73,6 +81,15 @@ export class AuthService {
       tokens
     };
   }
+
+  async getProfile(login: string) {
+    const user = await this.usersService.getByLogin(login)
+
+    if (!user) throw new NotFoundException('User does not exist');
+
+    return user
+  }
+
 
 	async logout(login: string) {
     return this.usersService.updateByLogin(login, { refreshToken: null });

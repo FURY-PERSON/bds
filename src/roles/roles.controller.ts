@@ -1,10 +1,11 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { WithAuth } from 'src/decorators/with-auth.decorator';
 import { ClassSerializer } from 'src/serializers/class.serializer';
 import { CreateRoleDto } from './dto/createRole.dto';
 import { Role } from './roles.entity';
 import { RolesService } from './roles.service';
+import { Roles } from './types';
 
 @ApiTags('Roles')
 @Controller('roles')
@@ -17,26 +18,41 @@ export class RolesController {
   
   @ClassSerializer(Role)
   @Post('/')
+  @WithAuth()
   @ApiResponse({ type: Role })
   create(@Body() roleDto: CreateRoleDto): Promise<Role> {
     return this.roleService.createRole(roleDto)
   }
 
   @ClassSerializer(Role)
-  @Get('/:names')
+  @Get('/')
+  @WithAuth()
+  @ApiQuery({
+    name: "names",
+    type: String,
+    required: false,
+    isArray: true
+  })
   @ApiResponse({ type: [Role] })
-  getByName(
+  getByNames(
     @Query('names') names: string[]
     ): Promise<Role[]> {
+      if(!names) {
+        return this.roleService.getAllRoles()
+      }
+
       const roleNames = Array.isArray(names) ? names : [names];
     return this.roleService.getAllRolesByName(roleNames)
   }
 
   @ClassSerializer(Role)
-  @Get('/')
+  @Get('/:name')
   @WithAuth()
-  @ApiResponse({ type: [Role] })
-  getAll(): Promise<Role[]> {
-    return this.roleService.getAllRoles()
+  @ApiResponse({ type: Role })
+  getByName(
+    @Param('name') name: Roles
+    ): Promise<Role> {
+
+    return this.roleService.getByName(name)
   }
 }

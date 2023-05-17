@@ -29,4 +29,12 @@ export class PermissionsService {
       }
     });
   }
+
+  async getById(id: string) {
+    return this.permissionRepository.findOne({
+      where: {
+        id: id
+      }
+    });
+  }
 }
