@@ -5,6 +5,7 @@ import { Role } from 'src/roles/roles.entity';
 import { Permission } from 'src/permissions/permisions.entity';
 import { News } from 'src/news/entities/news.entity';
 import { Comment } from 'src/comment/comment.entity';
+import { Notification } from 'src/notifications/notification.entity';
 
 @Entity({ name: "user" })
 export class User {
@@ -71,4 +72,13 @@ export class User {
 
   @OneToMany(() => Comment, comment => comment.dislikers)
   dislikers: Comment
+
+  @OneToMany(() => Notification, comment => comment.author)
+  createdNotifications: Notification[]
+
+  @ManyToMany(() => Notification, notification => notification.users)
+  notifications: Notification[]
+
+  @ManyToMany(() => Notification, comment => comment.readedUsers)
+  readedNotifications: Notification[]
 }

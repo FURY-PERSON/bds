@@ -23,6 +23,7 @@ import { NewsTextBlock } from './news/entities/newsTextBlock.entity';
 import { NewsImageBlock } from './news/entities/newsImageBlock.entity';
 import { NewsBlockBase } from './news/entities/newsBlockBase.entity';
 import { CommentModule } from './comment/comment.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   controllers: [],
@@ -57,6 +58,7 @@ import { CommentModule } from './comment/comment.module';
     BlockModule,
     RoomModule,
     CommentModule,
+    NotificationsModule,
   ],
 })
 export class AppModule {

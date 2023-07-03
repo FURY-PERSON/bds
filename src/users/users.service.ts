@@ -57,6 +57,7 @@ export class UsersService {
     const createdQuery = this.usersRepository.createQueryBuilder('user')
       .leftJoin('user.role', 'role')
       .leftJoin('user.permissions', 'permissions')
+      .leftJoin('user.notifications', 'notifications')
       .select([
         'user.id',
         'user.firstName',
@@ -66,6 +67,7 @@ export class UsersService {
         'user.email',
         'role',
         'permissions',
+        'notifications'
       ])
       .where('user.login ILIKE :login', {login: `%${loginSearch}%`})
       .orderBy(sort, orderBy);
@@ -113,6 +115,7 @@ export class UsersService {
       relations: {
         role: relations,
         permissions: relations,
+        notifications: relations
       }
     });
     
@@ -185,5 +188,9 @@ export class UsersService {
     }
 
     return this.usersRepository.save(updatedUser)
+  }
+
+  async getAllWithoutFilters() {
+    return this.usersRepository.find()
   }
 }
