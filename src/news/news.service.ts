@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DormsService } from 'src/dorms/dorms.service';
 import { FilesService } from 'src/files/files.service';;
@@ -11,6 +11,10 @@ import { NewsCodeBlock } from './entities/newsCodeBlock.entity';
 import { NewsImageBlock } from './entities/newsImageBlock.entity';
 import { NewsTextBlock } from './entities/newsTextBlock.entity';
 import { GetAllNewsParam, NewsBlock, NewsBlockType, NewsType } from './types/types';
+import { FeedbackService } from 'src/feedback/feedback.service';
+import { CreateFeedbackDto } from 'src/feedback/dto/createFeedback.dto';
+import { Role } from 'src/roles/roles.entity';
+import { Roles } from 'src/roles/types';
 
 @Injectable()
 export class NewsService {
@@ -26,6 +30,7 @@ export class NewsService {
     private fileService: FilesService,
     private dormService: DormsService,
     private userService: UsersService,
+    private feedbackService: FeedbackService,
     ) {
 
   }
@@ -120,7 +125,7 @@ export class NewsService {
     return this.newsRepository.save(updatedNews);
   }
 
-  async getAll(query: GetAllNewsParam) {
+  async getAll(query: GetAllNewsParam, userLogin: string) {
     const take = query.limit
     const page = query.page || 1;
     const title = query.title;
@@ -128,11 +133,18 @@ export class NewsService {
     const type = query.type;
     const sort = 'news.' + query.sort;
 
+    const user = await this.userService.getByLogin(userLogin, true);
+
+    if(!user) {
+      throw new NotFoundException('User doesn`t exist')
+    }
+
     const createdQuery = this.newsRepository.createQueryBuilder('news')
       .leftJoin('news.author', 'author')
       .leftJoin('news.dorm', 'dorm')
       .leftJoin('news.blocks', 'blocks')
       .leftJoin('news.comments', 'comments')
+      .leftJoin('news.feedbacks', 'feedbacks')
       .select([
         'news.id',
         'news.title',
@@ -142,6 +154,7 @@ export class NewsService {
         'news.imageUrl',
         'news.createdAt',
         'news.type',
+        'news.rating',
         'author',
         'dorm',
         'blocks',
@@ -149,6 +162,10 @@ export class NewsService {
       ])
       .where('news.title ILIKE :title', {title: `%${title}%`})
       .orderBy(sort, orderBy);
+
+      if(user.role?.name === Roles.ADMIN) {
+        createdQuery.addSelect('feedbacks')
+      }
 
       if(type && type !== NewsType.ALL) {
         createdQuery.andWhere('news.type LIKE :type', {type: `%${type}%`})
@@ -161,7 +178,8 @@ export class NewsService {
           .skip(skip)
       }
 
-    const [result, total] = await  createdQuery.getManyAndCount()
+
+    const [result, total] = await createdQuery.getManyAndCount();
 
     const totalPage = take && Math.ceil(total / take)
 
@@ -193,7 +211,7 @@ export class NewsService {
       relations: {
         author: relations,
         blocks: relations,
-        dorm: relations
+        dorm: relations,
       }
     });
     
@@ -225,5 +243,39 @@ export class NewsService {
       return await this.newsTextBlockRepository.save(block)
     }
 
+  }
+
+  async createFeedbackForNews(feedbackDto: CreateFeedbackDto, authorLogin: string) {
+    const {relatedEntityId} = feedbackDto;
+    const news = await this.newsRepository.findOne({
+      where: {
+        id: relatedEntityId
+      }
+    });
+
+    if(!news) {
+      throw new NotFoundException(`News with id ${news} doesn't exist`)
+    }
+
+    const author = await this.userService.getByLogin(authorLogin, false);
+
+    if(!author) {
+      throw new NotFoundException('User doesn`t exist')
+    }
+
+    const isAlreadyFeedback = await this.feedbackService.getUserFeedbacksByNewsId(news.id, author.login)
+
+    if(isAlreadyFeedback.length !== 0) {
+      throw new BadRequestException('You can not give feedback more than once.')
+    }
+
+    const createdFeedback = await this.feedbackService.createNewsFeedback(feedbackDto, author, news)
+
+    this.feedbackService.getRelatedEntityRating(news.id).then((rating: number) => {
+      news.rating = rating;
+      this.newsRepository.save(news)
+    })
+
+    return createdFeedback
   }
 }

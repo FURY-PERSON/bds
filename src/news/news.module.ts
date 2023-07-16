@@ -10,6 +10,7 @@ import { NewsCodeBlock } from './entities/newsCodeBlock.entity';
 import { NewsTextBlock } from './entities/newsTextBlock.entity';
 import { NewsImageBlock } from './entities/newsImageBlock.entity';
 import { NewsBlockBase } from './entities/newsBlockBase.entity';
+import { FeedbackModule } from 'src/feedback/feedback.module';
 
 @Module({
   controllers: [NewsController],
@@ -20,7 +21,8 @@ import { NewsBlockBase } from './entities/newsBlockBase.entity';
   imports: [
     TypeOrmModule.forFeature([News, NewsCodeBlock, NewsTextBlock, NewsImageBlock, NewsBlockBase]),
     DormsModule,
-    UsersModule
+    UsersModule,
+    FeedbackModule
   ],
   exports: [
     NewsService

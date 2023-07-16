@@ -6,6 +6,7 @@ import { Permission } from 'src/permissions/permisions.entity';
 import { News } from 'src/news/entities/news.entity';
 import { Comment } from 'src/comment/comment.entity';
 import { Notification } from 'src/notifications/notification.entity';
+import { Feedback } from 'src/feedback/feedback.entity';
 
 @Entity({ name: "user" })
 export class User {
@@ -72,6 +73,9 @@ export class User {
 
   @OneToMany(() => Comment, comment => comment.dislikers)
   dislikers: Comment
+
+  @OneToMany(() => Feedback, feedback => feedback.author)
+  feedbacks: Feedback
 
   @OneToMany(() => Notification, comment => comment.author)
   createdNotifications: Notification[]

@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from 'src/users/entities/users.entity';
@@ -7,6 +7,7 @@ import { NewsBlock, NewsType } from '../types/types';
 import { IsEnum } from 'class-validator';
 import { NewsBlockBase } from './newsBlockBase.entity';
 import { Comment } from 'src/comment/comment.entity';
+import { Feedback } from 'src/feedback/feedback.entity';
 
 @Entity({ name: "news" })
 export class News {
@@ -60,4 +61,14 @@ export class News {
   @OneToMany(() => Comment, comment => comment.news)
   @JoinColumn()
   comments: Array<Comment>
+
+  @OneToMany(() => Feedback, feedback => feedback.news)
+  @JoinColumn()
+  feedbacks: Array<Feedback>
+
+  @Column({
+    nullable: true,
+    type: 'decimal'
+  })
+  rating?: number
 }
