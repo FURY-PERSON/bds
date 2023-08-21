@@ -90,4 +90,16 @@ export class DormsService {
 
     return this.dormRepository.save(updatedDorm);
   }
+
+  async deleteById(id: string) {
+    const dorm = await this.dormRepository.findOne({
+      where: { id }
+    });
+
+    if(!dorm) {
+      throw new NotFoundException(`Dorm id: ${id} not found`)
+    }
+
+    return await this.dormRepository.remove(dorm)
+  }
 }

@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Param, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiConsumes, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { WithAuth } from 'src/decorators/with-auth.decorator';
 import { ClassSerializer } from 'src/serializers/class.serializer';
 import { Dorm } from './dorms.entity';
@@ -71,5 +71,16 @@ export class DormsController {
     @UploadedFile() image?: Express.Multer.File
   ): Promise<Dorm> {
     return this.dormService.updateDormByName(id, newsDto, image)
+  }
+
+  @Delete('/:id')
+  @WithAuth()
+  @ApiParam({
+    name: 'id',
+  })
+  deleteComment(
+    @Param() id: string,
+  ): Promise<Dorm> {
+    return this.dormService.deleteById(id)
   }
 }

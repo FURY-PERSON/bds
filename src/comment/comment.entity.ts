@@ -44,7 +44,7 @@ export class Comment {
   @Exclude()
   updatedAt: Date;
 
-  @ManyToOne(() => News, news => news.comments)
+  @ManyToOne(() => News, news => news.comments, {onDelete: 'CASCADE'})
   @JoinColumn()
   news: News;
 }

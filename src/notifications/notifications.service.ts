@@ -123,13 +123,12 @@ export class NotificationsService {
   }
 
   private async markAsRead(user: User, notification: Notification) {
-    console.log('rrr', notification)
     if(Array.isArray(notification.readedUsers)) {
       notification.readedUsers.push(user);
     } else {
       notification.readedUsers = [user]
     }
-    console.log('readed', notification)
+
     return this.notificationRepository.save(notification)
   }
 }

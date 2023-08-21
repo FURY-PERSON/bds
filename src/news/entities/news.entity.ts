@@ -58,7 +58,7 @@ export class News {
   @JoinColumn()
   blocks: Array<NewsBlock>
 
-  @OneToMany(() => Comment, comment => comment.news)
+  @OneToMany(() => Comment, comment => comment.news, {onDelete: 'CASCADE'})
   @JoinColumn()
   comments: Array<Comment>
 
