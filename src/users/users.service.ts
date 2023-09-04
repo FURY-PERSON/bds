@@ -10,6 +10,7 @@ import { CreateUserDto } from './dto/createUser.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { User } from './entities/users.entity';
 import { GetAllUsersParam } from './types/types';
+import { FeatureFlagService } from 'src/feature-flag/feature-flag.service';
 
 @Injectable()
 export class UsersService {
@@ -18,6 +19,7 @@ export class UsersService {
     private usersRepository: Repository<User>,
     private roleService: RolesService,
     private permissionService: PermissionsService,
+    private featureFlagService: FeatureFlagService,
     ) {
 
   }
@@ -43,7 +45,17 @@ export class UsersService {
 
     createdUser.role = userRole;
 
-    return this.usersRepository.save(createdUser);
+    const savedUser = await this.usersRepository.save(createdUser);
+
+    await this.featureFlagService.addFeatureFlagsToUser(savedUser);
+
+    const userWithFlags = await this.usersRepository.findOne({
+      where: {
+        login: userDto.login
+      }
+    })
+
+    return userWithFlags
   }
 
   async getAllUsers(query: GetAllUsersParam) {
@@ -58,6 +70,7 @@ export class UsersService {
       .leftJoin('user.role', 'role')
       .leftJoin('user.permissions', 'permissions')
       .leftJoin('user.notifications', 'notifications')
+      .leftJoin('user.featureFlags', 'featureFlags')
       .select([
         'user.id',
         'user.firstName',
@@ -67,7 +80,7 @@ export class UsersService {
         'user.email',
         'role',
         'permissions',
-        'notifications'
+        'featureFlags'
       ])
       .where('user.login ILIKE :login', {login: `%${loginSearch}%`})
       .orderBy(sort, orderBy);
@@ -101,7 +114,8 @@ export class UsersService {
       },
       relations: {
         role: relations,
-        permissions: relations
+        permissions: relations,
+        featureFlags: relations
       },
     });
     return users;
@@ -115,7 +129,8 @@ export class UsersService {
       relations: {
         role: relations,
         permissions: relations,
-        notifications: relations
+        notifications: relations,
+        featureFlags: relations
       }
     });
     
@@ -128,7 +143,8 @@ export class UsersService {
       where: {login: addRolesDto.login},
       relations: {
         role: true,
-        permissions: true
+        permissions: true,
+        featureFlags: true
       }
     })
 
@@ -151,7 +167,8 @@ export class UsersService {
       },
       relations: {
         role: true,
-        permissions: true
+        permissions: true,
+        featureFlags: true
       }
     })
 

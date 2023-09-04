@@ -12,7 +12,7 @@ import { UpdateFeedbackDto } from './dto/updateFeedback.dto';
 @Controller('feedback')
 export class FeedbackController {
   constructor(
-    private readonly commentService: FeedbackService
+    private readonly feedbackService: FeedbackService
   ) {
 
   }
@@ -28,7 +28,7 @@ export class FeedbackController {
     @Body() feedbackDto: UpdateFeedbackDto,
     @Param() id: string,
   ): Promise<Feedback> {
-    return this.commentService.updateComment(feedbackDto, id)
+    return this.feedbackService.updateComment(feedbackDto, id)
   }
 
   @ClassSerializer(Feedback)
@@ -45,11 +45,11 @@ export class FeedbackController {
     @Query('ids') ids?: string[]
   ): Promise<Feedback[]> {
     if(!ids) {
-      return this.commentService.getAll()
+      return this.feedbackService.getAll()
     }
 
     const commentIds = Array.isArray(ids) ? ids : [ids];
-    return this.commentService.getAllFeedbacksByIds(commentIds);
+    return this.feedbackService.getAllFeedbacksByIds(commentIds);
   }
 
   @ClassSerializer(Feedback)
@@ -57,7 +57,7 @@ export class FeedbackController {
   @WithAuth()
   @ApiResponse({ type: Feedback })
   getById(@Param('id') id: string): Promise<Feedback> {
-    return this.commentService.getById(id)
+    return this.feedbackService.getById(id)
   }
 
   @ClassSerializer(Feedback)
@@ -65,7 +65,7 @@ export class FeedbackController {
   @WithAuth()
   @ApiResponse({ type: Feedback })
   getAllByNewsId(@Param('id') id: string): Promise<Feedback[]> {
-    return this.commentService.getAllFeedbacksByNewsId(id)
+    return this.feedbackService.getAllFeedbacksByNewsId(id)
   }
 
   @ClassSerializer(Feedback)
@@ -76,7 +76,7 @@ export class FeedbackController {
     @Param('id') id: string,
     @Req() { user }: RequestWithUser,
     ): Promise<Feedback[]> {
-    return this.commentService.getUserFeedbacksByNewsId(id, user.login)
+    return this.feedbackService.getUserFeedbacksByNewsId(id, user.login)
   }
 
   @Delete('/:id')
@@ -88,6 +88,6 @@ export class FeedbackController {
   deleteComment(
     @Param() id: string,
   ): Promise<Feedback> {
-    return this.commentService.deleteById(id)
+    return this.feedbackService.deleteById(id)
   }
 }

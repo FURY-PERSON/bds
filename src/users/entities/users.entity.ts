@@ -1,5 +1,5 @@
-import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { Exclude } from 'class-transformer';
+import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Exclude, Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from 'src/roles/roles.entity';
 import { Permission } from 'src/permissions/permisions.entity';
@@ -7,6 +7,7 @@ import { News } from 'src/news/entities/news.entity';
 import { Comment } from 'src/comment/comment.entity';
 import { Notification } from 'src/notifications/notification.entity';
 import { Feedback } from 'src/feedback/feedback.entity';
+import { FeatureFlag } from 'src/feature-flag/entities/featureFlag.entity';
 
 @Entity({ name: "user" })
 export class User {
@@ -85,4 +86,7 @@ export class User {
 
   @ManyToMany(() => Notification, comment => comment.readedUsers)
   readedNotifications: Notification[]
+
+  @OneToOne(() => FeatureFlag, (featureFlag) => featureFlag.user, { eager: true })
+  featureFlags: FeatureFlag;
 }

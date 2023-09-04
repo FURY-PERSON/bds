@@ -6,6 +6,7 @@ import { UsersController } from './users.controller';
 import { User } from './entities/users.entity';
 import { UsersService } from './users.service';
 import { PermissionsModule } from 'src/permissions/permissions.module';
+import { FeatureFlagModule } from 'src/feature-flag/feature-flag.module';
 
 @Module({
   controllers: [UsersController],
@@ -14,7 +15,8 @@ import { PermissionsModule } from 'src/permissions/permissions.module';
     TypeOrmModule.forFeature([User]),
     forwardRef(() => AuthModule),
     RolesModule,
-    PermissionsModule
+    PermissionsModule,
+    FeatureFlagModule
   ],
   exports: [
     UsersService,

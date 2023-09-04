@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Exclude } from "class-transformer";
 import { News } from "src/news/entities/news.entity";
 import { User } from "src/users/entities/users.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity({ name: "comment" })
 export class Comment {

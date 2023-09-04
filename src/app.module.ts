@@ -25,6 +25,7 @@ import { NewsBlockBase } from './news/entities/newsBlockBase.entity';
 import { CommentModule } from './comment/comment.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { FeedbackModule } from './feedback/feedback.module';
+import { FeatureFlagModule } from './feature-flag/feature-flag.module';
 
 @Module({
   controllers: [],
@@ -61,6 +62,7 @@ import { FeedbackModule } from './feedback/feedback.module';
     CommentModule,
     NotificationsModule,
     FeedbackModule,
+    FeatureFlagModule,
   ],
 })
 export class AppModule {
