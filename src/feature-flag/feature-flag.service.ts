@@ -80,4 +80,22 @@ export class FeatureFlagService {
       name: featureFlagName
     })
   }
+
+  async getUserFeatureFlags(userLogin: string) {
+    const featureFlags = await this.featureFlagRepository.findOne({
+      where: {
+        user: {
+          login: userLogin
+        }
+      }
+    });
+
+    return featureFlags
+  }
+
+  async getAvailableFeatureFlags() {
+    const featureFlags = await this.featureFlagListRepository.find();
+
+    return featureFlags
+  }
 }
