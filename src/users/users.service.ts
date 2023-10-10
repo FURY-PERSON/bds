@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { uniqueArray } from 'src/helpers/uniqueArray';
 import { PermissionsService } from 'src/permissions/permissions.service';
 import { RolesService } from 'src/roles/roles.service';
-import { Roles } from 'src/roles/types';
 import { In, Repository } from 'typeorm';
 import { AddPermissionsDto } from './dto/addPermissions.dto';
 import { CreateUserDto } from './dto/createUser.dto';
@@ -52,6 +51,9 @@ export class UsersService {
     const userWithFlags = await this.usersRepository.findOne({
       where: {
         login: userDto.login
+      },
+      relations: {
+        featureFlags: true
       }
     })
 
@@ -115,7 +117,8 @@ export class UsersService {
       relations: {
         role: relations,
         permissions: relations,
-        featureFlags: relations
+        featureFlags: relations,
+        room: relations
       },
     });
     return users;
@@ -130,7 +133,8 @@ export class UsersService {
         role: relations,
         permissions: relations,
         notifications: relations,
-        featureFlags: relations
+        featureFlags: relations,
+        room: relations
       }
     });
     
@@ -168,7 +172,8 @@ export class UsersService {
       relations: {
         role: true,
         permissions: true,
-        featureFlags: true
+        featureFlags: true,
+        room: true
       }
     })
 

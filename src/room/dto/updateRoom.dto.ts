@@ -19,4 +19,10 @@ export class UpdateRoomDto {
   @ApiProperty()
   @ValidateIf(o => o.subNumber)
   subNumber?: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @ApiProperty()
+  @ValidateIf(o => o.peopleAmount)
+  peopleAmount?: number;
 }

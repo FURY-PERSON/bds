@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString, IsPhoneNumber, IsArray, ValidateIf } from "class-validator";
+import { IsNotEmpty, IsString, ValidateIf, IsNumber } from "class-validator";
 
 export class UpdateBlockDto {
   @IsNotEmpty()
@@ -13,4 +13,10 @@ export class UpdateBlockDto {
   @ApiProperty()
   @ValidateIf(o => o.number)
   number?: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  @ApiProperty()
+  @ValidateIf(o => o.floor)
+  floor?: number;
 }

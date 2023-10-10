@@ -5,6 +5,7 @@ import { In, Repository } from 'typeorm';
 import { CreateBlockDto } from './dto/createBlock.dto';
 import { UpdateBlockDto } from './dto/updateBlock.dto';
 import { Block } from './entities/block.entity';
+import { GetAllBlocksParam } from './types/types';
 
 @Injectable()
 export class BlockService {
@@ -69,7 +70,8 @@ export class BlockService {
         id: id
       },
       relations: {
-        dorm: true
+        dorm: true,
+        rooms: true
       }
     });
   }
@@ -80,16 +82,52 @@ export class BlockService {
         id: ids ? In(ids) : undefined,
       },
       relations: {
-        dorm: true
+        dorm: true,
+        rooms: true
       }
     });
   }
 
-  async getAll() {
-    return this.blockRepository.find({
-      relations: {
-        dorm: true
+
+  async getAllBlocks(query: GetAllBlocksParam) {
+    const take = query.limit || 20
+    const page = query.page || 1;
+    const numberSearch = query.number || '';
+    const orderBy = query.orderBy;
+    const floor = query.floor;
+
+    const createdQuery = this.blockRepository.createQueryBuilder('block')
+      .leftJoin('block.dorm', 'dorm')
+      .leftJoin('block.rooms', 'rooms')
+      .select([
+        'block.id',
+        'block.number',
+        'block.floor',
+        'dorm',
+        'rooms',
+      ])
+      .where('block.number ILIKE :number', {number: `%${numberSearch}%`})
+      .orderBy('block.number', orderBy);
+
+      if(floor) {
+        createdQuery.andWhere('block.floor::text LIKE :floor', {floor: `%${floor}%`})
       }
-    })
+
+      if(take && page) {
+        const skip = (page-1) * take ;
+        createdQuery      
+          .take(take)
+          .skip(skip)
+      }
+
+    const [result, total] = await  createdQuery.getManyAndCount()
+
+    const totalPage = take && Math.ceil(total / take)
+
+    return {
+      result, 
+      total,
+      totalPage
+    }
   }
 }

@@ -8,6 +8,7 @@ import { Comment } from 'src/comment/comment.entity';
 import { Notification } from 'src/notifications/notification.entity';
 import { Feedback } from 'src/feedback/feedback.entity';
 import { FeatureFlag } from 'src/feature-flag/entities/featureFlag.entity';
+import { Room } from 'src/room/room.entity';
 
 @Entity({ name: "user" })
 export class User {
@@ -80,6 +81,9 @@ export class User {
 
   @OneToMany(() => Notification, comment => comment.author)
   createdNotifications: Notification[]
+
+  @ManyToOne(() => Room, room => room.tenants)
+  room: Room
 
   @ManyToMany(() => Notification, notification => notification.users)
   notifications: Notification[]

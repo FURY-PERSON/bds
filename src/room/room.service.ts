@@ -22,7 +22,7 @@ export class RoomService {
     const block = await this.blockService.getById(blockId);
 
     if(!block) {
-      throw new NotFoundException('Dorm doesn`t exist')
+      throw new NotFoundException('Block doesn`t exist')
     }
 
     const room = this.roomRepository.create({
@@ -51,7 +51,7 @@ export class RoomService {
     const block = await this.blockService.getById(roomDto.blockId);
 
     if(!block) {
-      throw new NotFoundException('Dorm doesn`t exist')
+      throw new NotFoundException('Block doesn`t exist')
     }
 
     updatedRoom.block = block;
@@ -66,7 +66,8 @@ export class RoomService {
         id: id
       },
       relations: {
-        block: true
+        block: true,
+        tenants: true
       }
     });
   }
@@ -77,7 +78,8 @@ export class RoomService {
         id: ids ? In(ids) : undefined,
       },
       relations: {
-        block: true
+        block: true,
+        tenants: true
       }
     });
   }

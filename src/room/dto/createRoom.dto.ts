@@ -16,4 +16,9 @@ export class CreateRoomDto {
   @IsString()
   @ApiProperty()
   subNumber: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @ApiProperty()
+  peopleAmount: number;
 }

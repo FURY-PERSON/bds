@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, Response } from '@nestjs/common';
 import { ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { WithAuth } from 'src/decorators/with-auth.decorator';
 import { ClassSerializer } from 'src/serializers/class.serializer';
@@ -6,6 +6,7 @@ import { BlockService } from './block.service';
 import { CreateBlockDto } from './dto/createBlock.dto';
 import { UpdateBlockDto } from './dto/updateBlock.dto';
 import { Block } from './entities/block.entity';
+import { Response as Res } from 'express';
 
 @Controller('block')
 @ApiTags('Block')
@@ -60,16 +61,55 @@ export class BlockController {
     required: false,
     isArray: true
   })
+  @ApiQuery({
+    name: "page",
+    type: Number,
+    required: false,
+  })
+  @ApiQuery({
+    name: "limit",
+    type: Number,
+    required: false,
+  })
+  @ApiQuery({
+    name: "number",
+    type: String,
+    required: false,
+  })
+  @ApiQuery({
+    name: "floor",
+    type: Number,
+    required: false,
+  })
+  @ApiQuery({
+    name: "orderBy",
+    type: String,
+    required: false,
+  })
   @ApiResponse({ type: [Block] })
-  getAllBlocksByIds(
-    @Query() {ids}:  {ids?: string[]}
-    ): Promise<Block[]> {
-      if(!ids) {
-        return this.blockService.getAll()
-      }
+  async getAllBlocksByIds( 
+    @Query('ids') ids?: string[],
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+    @Query('orderBy') orderBy: 'DESC' | 'ASC' = 'DESC',
+    @Query('floor') floor?: number,
+    @Query('number') number?: string,
+    @Response() res?: Res
+    ) {
 
-    const blockIds = Array.isArray(ids) ? ids : [ids];
-    return this.blockService.getByIds(blockIds)
+    if(ids) {
+      const blocksIds = Array.isArray(ids) ? ids : [ids];
+      const blocks = await this.blockService.getByIds(blocksIds);
+      res.send(blocks)
+      return blocks
+    }
+
+    const {result, total, totalPage} = await this.blockService.getAllBlocks({page, limit, orderBy, floor, number})
+    res.set({'X-Total-Item': total })
+    res.set({'X-Current-Page': page })
+    res.set({'X-Total-Page': totalPage})
+    res.send(result)
+    return result
   }
 
 }

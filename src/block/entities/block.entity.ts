@@ -1,5 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Exclude } from 'class-transformer';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Dorm } from 'src/dorms/dorms.entity';
 import { IsNotEmpty } from 'class-validator';
@@ -15,9 +14,14 @@ export class Block {
   @IsNotEmpty()
   number: string;
 
+  @ApiProperty()
+  @Column()
+  @IsNotEmpty()
+  floor: number;
+
   @ManyToOne(() => Dorm, dorm => dorm.block)
   dorm:Dorm
   
   @OneToMany(() => Room, rooms => rooms.block)
-  rooms: Room
+  rooms: Room[]
 }
