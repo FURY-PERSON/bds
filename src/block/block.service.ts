@@ -6,10 +6,20 @@ import { CreateBlockDto } from './dto/createBlock.dto';
 import { UpdateBlockDto } from './dto/updateBlock.dto';
 import { Block } from './entities/block.entity';
 import { GetAllBlocksParam } from './types/types';
+import { CreateBlockSanitaryVisitDto } from './dto/createblockSanitaryVisit.dto';
+import { BlockSanitaryVisit } from './entities/blockSanitaryVisit.entity';
+import { allBlockSanitaryEntity } from './types/blockSanitary';
+import { BlockSanitaryMark } from './entities/blockSanitaryMark.entity';
+import { UpdateBlockSanitaryVisitDto } from './dto/updateBlockSanitaryVisit.dto';
+import { UpdateBlockSanitaryMarkDto } from './dto/updateBlockSanitaryMark.dto';
 
 @Injectable()
 export class BlockService {
   constructor(
+    @InjectRepository(BlockSanitaryMark)
+    private blockSanitaryMarkRepository: Repository<BlockSanitaryMark>,
+    @InjectRepository(BlockSanitaryVisit)
+    private blockSanitaryVisitRepository: Repository<BlockSanitaryVisit>,
     @InjectRepository(Block)
     private blockRepository: Repository<Block>,
     private dormService: DormsService,
@@ -129,5 +139,124 @@ export class BlockService {
       total,
       totalPage
     }
+  }
+
+
+  async createBlockSanitaryVisit(blockSanitaryVisitDto: CreateBlockSanitaryVisitDto) {
+    const {blockId} = blockSanitaryVisitDto;
+
+    const block = await this.blockRepository.findOne({where: {
+      id: blockId
+    }});
+
+    if(!block) {
+      throw new NotFoundException('Block doesn`t exist')
+    }
+
+    const blockSanitaryVisit = await this.blockSanitaryVisitRepository.save({
+      date: blockSanitaryVisitDto.date,
+      block: block
+    });
+
+    blockSanitaryVisit.marks = [];
+
+    for (let i = 0; i < allBlockSanitaryEntity.length; i++) {
+      await this.blockSanitaryMarkRepository.save({
+        visit: blockSanitaryVisit,
+        type: allBlockSanitaryEntity[i],
+      });
+      
+    }
+
+    
+    return this.blockSanitaryVisitRepository.findOne({
+      where: {
+        id: blockSanitaryVisit.id
+      },
+      relations: {
+       marks: true,
+       block: true
+      }
+    });
+  }
+
+  async updateBlockSanitaryVisit(updateBlockSanitaryVisit: UpdateBlockSanitaryVisitDto, id: string) {
+    const blockSanitaryVisit = await this.blockSanitaryVisitRepository.findOne({
+      where: { id }
+    });
+    
+    if(!blockSanitaryVisit) {
+      throw new HttpException('Visit not found', HttpStatus.NOT_FOUND)
+    }
+
+    await this.blockSanitaryVisitRepository.save({
+      ...blockSanitaryVisit,
+      date: updateBlockSanitaryVisit.date ?? blockSanitaryVisit.date
+    })  
+
+    return this.blockSanitaryVisitRepository.findOne({
+      where: {
+        id: id
+      },
+      relations: {
+        block: true,
+        marks: true
+      }
+    });
+  }
+
+  async updateBlockSanitaryMark(updateBlockSanitaryMark: UpdateBlockSanitaryMarkDto, id: string) {
+    const blockSanitaryMark = await this.blockSanitaryMarkRepository.findOne({
+      where: { id }
+    });
+    
+    if(!blockSanitaryMark) {
+      throw new HttpException('Mark not found', HttpStatus.NOT_FOUND)
+    }
+
+    return await this.blockSanitaryMarkRepository.save({
+      ...blockSanitaryMark,
+      mark: updateBlockSanitaryMark.mark ?? blockSanitaryMark.mark
+    })  
+  }
+
+  async getBlockSanitaryVisitById(id: string) {
+
+    return this.blockSanitaryVisitRepository.findOne({
+      where: {
+        id: id
+      },
+      relations: {
+        block: true,
+        marks: true
+      }
+    });
+  }
+
+  async getBlockSanitaryVisits(blockId: string) {
+
+    return this.blockSanitaryVisitRepository.find({
+      where: {
+        block: {
+          id: blockId
+        }
+      },
+      relations: {
+       marks: true,
+       block: true
+      }
+    });
+  }
+
+  async deleteSanitaryVisitById(id: string) {
+    const sanitaryVisit = await this.blockSanitaryVisitRepository.findOne({
+      where: { id }
+    });
+
+    if(!sanitaryVisit) {
+      throw new NotFoundException(`Sanitary Visit id: ${id} not found`)
+    }
+
+    return await this.blockSanitaryVisitRepository.remove(sanitaryVisit)
   }
 }

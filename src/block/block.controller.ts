@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Query, Response } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Response } from '@nestjs/common';
 import { ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { WithAuth } from 'src/decorators/with-auth.decorator';
 import { ClassSerializer } from 'src/serializers/class.serializer';
@@ -7,6 +7,11 @@ import { CreateBlockDto } from './dto/createBlock.dto';
 import { UpdateBlockDto } from './dto/updateBlock.dto';
 import { Block } from './entities/block.entity';
 import { Response as Res } from 'express';
+import { BlockSanitaryVisit } from './entities/blockSanitaryVisit.entity';
+import { CreateBlockSanitaryVisitDto } from './dto/createblockSanitaryVisit.dto';
+import { UpdateBlockSanitaryVisitDto } from './dto/updateBlockSanitaryVisit.dto';
+import { BlockSanitaryMark } from './entities/blockSanitaryMark.entity';
+import { UpdateBlockSanitaryMarkDto } from './dto/updateBlockSanitaryMark.dto';
 
 @Controller('block')
 @ApiTags('Block')
@@ -22,9 +27,9 @@ export class BlockController {
   @WithAuth()
   @ApiResponse({ type: Block })
   createBlock(
-    @Body() newsDto: CreateBlockDto,
+    @Body() blockDto: CreateBlockDto,
   ): Promise<Block> {
-    return this.blockService.createBlock(newsDto)
+    return this.blockService.createBlock(blockDto)
   }
 
   @ClassSerializer(Block)
@@ -110,6 +115,79 @@ export class BlockController {
     res.set({'X-Total-Page': totalPage})
     res.send(result)
     return result
+  }
+
+
+
+  @ClassSerializer(BlockSanitaryVisit)
+  @Post('/sanitaryVisit')
+  @WithAuth()
+  @ApiResponse({ type: BlockSanitaryVisit })
+  createBlockSanitaryVisit(
+    @Body() blockSanitaryVisitDto: CreateBlockSanitaryVisitDto,
+  ): Promise<BlockSanitaryVisit> {
+    return this.blockService.createBlockSanitaryVisit(blockSanitaryVisitDto)
+  }
+
+  @ClassSerializer(BlockSanitaryVisit)
+  @Put('/sanitaryVisit/:id')
+  @WithAuth()
+  @ApiResponse({ type: BlockSanitaryVisit })
+  @ApiParam({
+    name: "id",
+    type: String,
+    required: false,
+  })
+  updateBlockSanitaryVisit(
+    @Body() blockSanitaryVisitDto: UpdateBlockSanitaryVisitDto,
+    @Param() id: string,
+  ): Promise<BlockSanitaryVisit> {
+    return this.blockService.updateBlockSanitaryVisit(blockSanitaryVisitDto, id)
+  }
+
+  @ClassSerializer(BlockSanitaryMark)
+  @Put('/sanitaryMark/:id')
+  @WithAuth()
+  @ApiResponse({ type: BlockSanitaryMark })
+  @ApiParam({
+    name: "id",
+    type: String,
+    required: false,
+  })
+  updateBlockSanitaryMark(
+    @Body() blockSanitaryVisitDto: UpdateBlockSanitaryMarkDto,
+    @Param() id: string,
+  ): Promise<BlockSanitaryMark> {
+    return this.blockService.updateBlockSanitaryMark(blockSanitaryVisitDto, id)
+  }
+
+
+  @ClassSerializer(BlockSanitaryVisit)
+  @Get('/sanitaryVisit/:id')
+  @WithAuth()
+  @ApiResponse({ type: BlockSanitaryVisit })
+  getBlockSanitaryVisitById(@Param('id') sanitaryVisitId: string): Promise<BlockSanitaryVisit> {
+    return this.blockService.getBlockSanitaryVisitById(sanitaryVisitId)
+  }
+
+  @ClassSerializer(BlockSanitaryVisit)
+  @Get('/sanitaryVisit/block/:id')
+  @WithAuth()
+  @ApiResponse({ type: BlockSanitaryVisit })
+  getBlockSanitaryVisits(@Param('id') blockId: string): Promise<BlockSanitaryVisit[]> {
+    return this.blockService.getBlockSanitaryVisits(blockId)
+  }
+
+  @Delete('sanitaryVisit/:id')
+  @WithAuth()
+  @ApiParam({
+    name: 'id',
+  })
+  @ApiResponse({ type: BlockSanitaryVisit })
+  deleteBlock(
+    @Param() id: string,
+  ): Promise<BlockSanitaryVisit> {
+    return this.blockService.deleteSanitaryVisitById(id)
   }
 
 }
