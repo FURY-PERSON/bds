@@ -161,17 +161,8 @@ export class BlockController {
     return this.blockService.updateBlockSanitaryMark(blockSanitaryVisitDto, id)
   }
 
-
   @ClassSerializer(BlockSanitaryVisit)
   @Get('/sanitaryVisit/:id')
-  @WithAuth()
-  @ApiResponse({ type: BlockSanitaryVisit })
-  getBlockSanitaryVisitById(@Param('id') sanitaryVisitId: string): Promise<BlockSanitaryVisit> {
-    return this.blockService.getBlockSanitaryVisitById(sanitaryVisitId)
-  }
-
-  @ClassSerializer(BlockSanitaryVisit)
-  @Get('/sanitaryVisit/block/:id')
   @WithAuth()
   @ApiResponse({ type: BlockSanitaryVisit })
   getBlockSanitaryVisits(@Param('id') blockId: string): Promise<BlockSanitaryVisit[]> {

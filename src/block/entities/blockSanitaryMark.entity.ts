@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum } from 'class-validator';
+import { IsEnum, IsString } from 'class-validator';
 import { BlockSanitaryEntity } from '../types/blockSanitary';
 import { BlockSanitaryVisit } from './blockSanitaryVisit.entity';
 import { Exclude } from 'class-transformer';
@@ -14,6 +14,11 @@ export class BlockSanitaryMark {
   @Column()
   @IsEnum(BlockSanitaryEntity)
   type: BlockSanitaryEntity;
+
+  @ApiProperty()
+  @Column()
+  @IsString()
+  name: string;
 
   @ApiProperty()
   @Column({nullable: true})

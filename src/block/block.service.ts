@@ -8,7 +8,7 @@ import { Block } from './entities/block.entity';
 import { GetAllBlocksParam } from './types/types';
 import { CreateBlockSanitaryVisitDto } from './dto/createblockSanitaryVisit.dto';
 import { BlockSanitaryVisit } from './entities/blockSanitaryVisit.entity';
-import { allBlockSanitaryEntity } from './types/blockSanitary';
+import { allBlockSanitaryEntity, blockSanitaryEntityToNameMap } from './types/blockSanitary';
 import { BlockSanitaryMark } from './entities/blockSanitaryMark.entity';
 import { UpdateBlockSanitaryVisitDto } from './dto/updateBlockSanitaryVisit.dto';
 import { UpdateBlockSanitaryMarkDto } from './dto/updateBlockSanitaryMark.dto';
@@ -155,7 +155,8 @@ export class BlockService {
 
     const blockSanitaryVisit = await this.blockSanitaryVisitRepository.save({
       date: blockSanitaryVisitDto.date,
-      block: block
+      block: block,
+      marks: []
     });
 
     blockSanitaryVisit.marks = [];
@@ -164,6 +165,7 @@ export class BlockService {
       await this.blockSanitaryMarkRepository.save({
         visit: blockSanitaryVisit,
         type: allBlockSanitaryEntity[i],
+        name: blockSanitaryEntityToNameMap[allBlockSanitaryEntity[i]]
       });
       
     }
@@ -216,21 +218,8 @@ export class BlockService {
 
     return await this.blockSanitaryMarkRepository.save({
       ...blockSanitaryMark,
-      mark: updateBlockSanitaryMark.mark ?? blockSanitaryMark.mark
+      mark: updateBlockSanitaryMark.mark || null
     })  
-  }
-
-  async getBlockSanitaryVisitById(id: string) {
-
-    return this.blockSanitaryVisitRepository.findOne({
-      where: {
-        id: id
-      },
-      relations: {
-        block: true,
-        marks: true
-      }
-    });
   }
 
   async getBlockSanitaryVisits(blockId: string) {
@@ -239,6 +228,12 @@ export class BlockService {
       where: {
         block: {
           id: blockId
+        }
+      },
+      order: {
+        date: 'ASC',
+        marks: {
+          type: 'ASC'
         }
       },
       relations: {
