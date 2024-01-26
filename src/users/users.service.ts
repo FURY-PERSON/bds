@@ -118,7 +118,8 @@ export class UsersService {
         role: relations,
         permissions: relations,
         featureFlags: relations,
-        room: relations
+        room: relations,
+        block: relations
       },
     });
     return users;
@@ -134,7 +135,8 @@ export class UsersService {
         permissions: relations,
         notifications: relations,
         featureFlags: relations,
-        room: relations
+        room: relations,
+        block: relations
       }
     });
     
@@ -173,7 +175,8 @@ export class UsersService {
         role: true,
         permissions: true,
         featureFlags: true,
-        room: true
+        room: true,
+        block: true
       }
     })
 

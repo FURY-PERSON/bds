@@ -4,6 +4,7 @@ import { Dorm } from 'src/dorms/dorms.entity';
 import { IsNotEmpty } from 'class-validator';
 import { Room } from 'src/room/room.entity';
 import { BlockSanitaryVisit } from './blockSanitaryVisit.entity';
+import { User } from 'src/users/entities/users.entity';
 
 @Entity({ name: "block" })
 export class Block {
@@ -26,6 +27,9 @@ export class Block {
   @OneToMany(() => Room, rooms => rooms.block)
   @JoinColumn()
   rooms: Room[]
+
+  @OneToMany(() => User, user => user.block)
+  tenants:User[]
 
   @OneToMany(() => BlockSanitaryVisit, sanitaryVisits => sanitaryVisits.block)
   @JoinColumn()

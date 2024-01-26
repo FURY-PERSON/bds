@@ -12,6 +12,9 @@ import { allBlockSanitaryEntity, blockSanitaryEntityToNameMap } from './types/bl
 import { BlockSanitaryMark } from './entities/blockSanitaryMark.entity';
 import { UpdateBlockSanitaryVisitDto } from './dto/updateBlockSanitaryVisit.dto';
 import { UpdateBlockSanitaryMarkDto } from './dto/updateBlockSanitaryMark.dto';
+import { AddUserToBlockDto } from './dto/addUserToBlock.dto';
+import { UsersService } from 'src/users/users.service';
+import { DeleteUserFromBlock } from './dto/deleteUserFromBlock.dto';
 
 @Injectable()
 export class BlockService {
@@ -23,6 +26,7 @@ export class BlockService {
     @InjectRepository(Block)
     private blockRepository: Repository<Block>,
     private dormService: DormsService,
+    private usersService: UsersService
     ) {
 
   }
@@ -81,7 +85,8 @@ export class BlockService {
       },
       relations: {
         dorm: true,
-        rooms: true
+        rooms: true,
+        tenants: true        
       }
     });
   }
@@ -222,6 +227,31 @@ export class BlockService {
     })  
   }
 
+  async addUserToBlock(addUserToBlockDto: AddUserToBlockDto, id: string) {
+    const user = await this.usersService.getByLogin(addUserToBlockDto.userLogin);
+    
+    if(!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND)
+    }
+
+    const block = await this.blockRepository.findOne({
+      where: {
+        id: id 
+      },
+      relations: {
+        tenants: true,
+      }
+    })
+
+    if(!block) {
+      throw new HttpException('Block not found', HttpStatus.NOT_FOUND)
+    }
+
+    block.tenants.push(user)
+
+    return await this.blockRepository.save(block)  
+  }
+
   async getBlockSanitaryVisits(blockId: string) {
 
     return this.blockSanitaryVisitRepository.find({
@@ -253,5 +283,30 @@ export class BlockService {
     }
 
     return await this.blockSanitaryVisitRepository.remove(sanitaryVisit)
+  }
+
+  async deleteUserFromBlock(deleteUserFromBlockDto: DeleteUserFromBlock, id: string) {
+    const block = await this.blockRepository.findOne({
+      where: { id },
+      relations: {
+        tenants: true
+      }
+    });
+
+    if(!block) {
+      throw new NotFoundException(`Block id: ${id} not found`)
+    }
+
+    const userToDelete = block.tenants.find((tenant) => tenant.login === deleteUserFromBlockDto.userLogin )
+
+    if(!userToDelete) {
+      throw new NotFoundException(`User: ${deleteUserFromBlockDto.userLogin} not linked to block id: ${id}`)
+    }
+
+    const newTenants =  block.tenants.filter((tenant) => tenant.login !== deleteUserFromBlockDto.userLogin );
+
+    block.tenants = newTenants;
+
+    return await this.blockRepository.save(block)
   }
 }

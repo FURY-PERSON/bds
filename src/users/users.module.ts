@@ -16,7 +16,7 @@ import { FeatureFlagModule } from 'src/feature-flag/feature-flag.module';
     forwardRef(() => AuthModule),
     RolesModule,
     PermissionsModule,
-    FeatureFlagModule
+    FeatureFlagModule,
   ],
   exports: [
     UsersService,

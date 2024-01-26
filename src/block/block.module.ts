@@ -6,6 +6,7 @@ import { BlockService } from './block.service';
 import { Block } from './entities/block.entity';
 import { BlockSanitaryVisit } from './entities/blockSanitaryVisit.entity';
 import { BlockSanitaryMark } from './entities/blockSanitaryMark.entity';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   controllers: [BlockController],
@@ -14,6 +15,7 @@ import { BlockSanitaryMark } from './entities/blockSanitaryMark.entity';
   imports: [
     TypeOrmModule.forFeature([Block, BlockSanitaryVisit, BlockSanitaryMark]),
     DormsModule,
+    UsersModule
   ]
 })
 export class BlockModule {}

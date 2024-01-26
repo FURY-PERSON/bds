@@ -12,6 +12,8 @@ import { CreateBlockSanitaryVisitDto } from './dto/createblockSanitaryVisit.dto'
 import { UpdateBlockSanitaryVisitDto } from './dto/updateBlockSanitaryVisit.dto';
 import { BlockSanitaryMark } from './entities/blockSanitaryMark.entity';
 import { UpdateBlockSanitaryMarkDto } from './dto/updateBlockSanitaryMark.dto';
+import { AddUserToBlockDto } from './dto/addUserToBlock.dto';
+import { DeleteUserFromBlock } from './dto/deleteUserFromBlock.dto';
 
 @Controller('block')
 @ApiTags('Block')
@@ -179,6 +181,39 @@ export class BlockController {
     @Param() id: string,
   ): Promise<BlockSanitaryVisit> {
     return this.blockService.deleteSanitaryVisitById(id)
+  }
+
+
+  @ClassSerializer(Block)
+  @Put('/user/:id')
+  @WithAuth()
+  @ApiResponse({ type: Block })
+  @ApiParam({
+    name: "id",
+    type: String,
+    required: false,
+  })
+  addUserToBlock(
+    @Body() blockSanitaryVisitDto: AddUserToBlockDto,
+    @Param() id: string,
+  ): Promise<Block> {
+    return this.blockService.addUserToBlock(blockSanitaryVisitDto, id)
+  }
+
+  @ClassSerializer(Block)
+  @Delete('/user/:id')
+  @WithAuth()
+  @ApiResponse({ type: Block })
+  @ApiParam({
+    name: "id",
+    type: String,
+    required: false,
+  })
+  deleteUserFromBlock(
+    @Body() blockSanitaryVisitDto: DeleteUserFromBlock,
+    @Param() id: string,
+  ): Promise<Block> {
+    return this.blockService.deleteUserFromBlock(blockSanitaryVisitDto, id)
   }
 
 }
