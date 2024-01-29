@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString, IsPhoneNumber, IsArray } from "class-validator";
+import { IsNotEmpty, IsString, IsPhoneNumber, IsArray, IsNumber } from "class-validator";
 
 export class CreateRoomDto {
   @IsNotEmpty()
@@ -18,7 +18,7 @@ export class CreateRoomDto {
   subNumber: string;
 
   @IsNotEmpty()
-  @IsString()
+  @IsNumber()
   @ApiProperty()
   peopleAmount: number;
 }

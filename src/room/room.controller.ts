@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Permissions } from 'src/decorators/permissions.decorator';
 import { WithAuth } from 'src/decorators/with-auth.decorator';
@@ -8,6 +8,8 @@ import { CreateRoomDto } from './dto/createRoom.dto';
 import { UpdateRoomDto } from './dto/updateRoom.dto';
 import { Room } from './room.entity';
 import { RoomService } from './room.service';
+import { AddUserToRoomDto } from './dto/addUserToRoom';
+import { DeleteUserFromRoom } from './dto/deleteUserFromRoom.dto';
 
 @Controller('room')
 @ApiTags('Room')
@@ -75,4 +77,36 @@ export class RoomController {
     return this.roomService.getByIds(roomIds)
   }
 
+
+  @ClassSerializer(Room)
+  @Put('/user/:id')
+  @WithAuth()
+  @ApiResponse({ type: Room })
+  @ApiParam({
+    name: "id",
+    type: String,
+    required: false,
+  })
+  addUserToBlock(
+    @Body() blockSanitaryVisitDto: AddUserToRoomDto,
+    @Param() id: string,
+  ): Promise<Room> {
+    return this.roomService.addUserToRoom(blockSanitaryVisitDto, id)
+  }
+
+  @ClassSerializer(Room)
+  @Delete('/user/:id')
+  @WithAuth()
+  @ApiResponse({ type: Room })
+  @ApiParam({
+    name: "id",
+    type: String,
+    required: false,
+  })
+  deleteUserFromBlock(
+    @Body() blockSanitaryVisitDto: DeleteUserFromRoom,
+    @Param() id: string,
+  ): Promise<Room> {
+    return this.roomService.deleteUserFromRoom(blockSanitaryVisitDto, id)
+  }
 }
