@@ -6,7 +6,7 @@ import { CreateBlockDto } from './dto/createBlock.dto';
 import { UpdateBlockDto } from './dto/updateBlock.dto';
 import { Block } from './entities/block.entity';
 import { GetAllBlocksParam } from './types/types';
-import { CreateBlockSanitaryVisitDto } from './dto/createblockSanitaryVisit.dto';
+import { CreateBlockSanitaryVisitDto } from './dto/createBlockSanitaryVisit.dto';
 import { BlockSanitaryVisit } from './entities/blockSanitaryVisit.entity';
 import { allBlockSanitaryEntity, blockSanitaryEntityToNameMap } from './types/blockSanitary';
 import { BlockSanitaryMark } from './entities/blockSanitaryMark.entity';

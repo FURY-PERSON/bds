@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from 'src/users/users.service';
 import { In, Repository } from 'typeorm';
 import { CreateWatchDto } from './dto/createWatch.dto';
-import { UpdateWatchDto } from './dto/UpdateOptDto.dto';
+import { UpdateWatchDto } from './dto/updateOptDto.dto';
 import { WatchStatus } from './types/enums';
 import { Watch } from './watch.entity';
 

@@ -8,7 +8,7 @@ import { UpdateBlockDto } from './dto/updateBlock.dto';
 import { Block } from './entities/block.entity';
 import { Response as Res } from 'express';
 import { BlockSanitaryVisit } from './entities/blockSanitaryVisit.entity';
-import { CreateBlockSanitaryVisitDto } from './dto/createblockSanitaryVisit.dto';
+import { CreateBlockSanitaryVisitDto } from './dto/createBlockSanitaryVisit.dto';
 import { UpdateBlockSanitaryVisitDto } from './dto/updateBlockSanitaryVisit.dto';
 import { BlockSanitaryMark } from './entities/blockSanitaryMark.entity';
 import { UpdateBlockSanitaryMarkDto } from './dto/updateBlockSanitaryMark.dto';
