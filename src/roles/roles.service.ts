@@ -5,6 +5,7 @@ import { In, Repository } from 'typeorm';
 import { CreateRoleDto } from './dto/createRole.dto';
 import { Role } from './roles.entity';
 import { Roles } from './types';
+import { rolePermissionsMap } from './constants/rolePermissionsMap';
 
 @Injectable()
 export class RolesService {
@@ -40,5 +41,9 @@ export class RolesService {
       where: { name },
     });
     return role;
+  }
+
+  getRolePermissionsName(name: Roles): Array<string> {
+    return rolePermissionsMap[name]
   }
 }

@@ -37,4 +37,12 @@ export class PermissionsService {
       }
     });
   }
+
+  async getByName(name: string) {
+    return this.permissionRepository.findOne({
+      where: {
+        name: name
+      }
+    });
+  }
 }

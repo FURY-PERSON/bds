@@ -10,6 +10,7 @@ import { UpdateUserDto } from './dto/updateUser.dto';
 import { User } from './entities/users.entity';
 import { GetAllUsersParam } from './types/types';
 import { FeatureFlagService } from 'src/feature-flag/feature-flag.service';
+import { rolePermissionsMap } from '../roles/constants/rolePermissionsMap';
 
 @Injectable()
 export class UsersService {
@@ -43,6 +44,14 @@ export class UsersService {
     }
 
     createdUser.role = userRole;
+
+    const permissionsName = this.roleService.getRolePermissionsName(userRole.name)
+
+    const permissionPromises = permissionsName.map((roleName) => this.permissionService.getByName(roleName));
+
+    const permissions = await Promise.all(permissionPromises);
+
+    createdUser.permissions = permissions;
 
     const savedUser = await this.usersRepository.save(createdUser);
 
