@@ -14,12 +14,12 @@ export default class RoleGuard implements CanActivate {
     }
 
     async canActivate(context: ExecutionContext) {
-      const requiredRole = this.reflector.getAllAndOverride<Roles>(ROLES_KEY, [
+      const requiredRoles = this.reflector.getAllAndOverride<Roles>(ROLES_KEY, [
         context.getHandler(),
         context.getClass()
       ]);
 
-      if(!requiredRole) {
+      if(!requiredRoles) {
         return true
       }
 
@@ -29,7 +29,7 @@ export default class RoleGuard implements CanActivate {
       const user = await this.userService.getByLogin(login);
 
       try {
-        return user.role.name == requiredRole;
+        return requiredRoles.includes(user.role.name);
       } catch(error) {
         throw new HttpException('Access denied', HttpStatus.FORBIDDEN)
       }

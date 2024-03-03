@@ -111,6 +111,8 @@ export class UsersController {
 
   @ClassSerializer(User)
   @Post('/permission')
+  @Roles("admin")
+  @WithRole()
   @WithAuth()
   @ApiResponse({ type: User })
   addPermissions(@Body() addRolesDto: AddPermissionsDto): Promise<User> {
