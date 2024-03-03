@@ -10,6 +10,8 @@ import { Room } from './room.entity';
 import { RoomService } from './room.service';
 import { AddUserToRoomDto } from './dto/addUserToRoom';
 import { DeleteUserFromRoom } from './dto/deleteUserFromRoom.dto';
+import { Roles } from 'src/decorators/roles.decorator';
+import { WithRole } from 'src/decorators/withRoles.decorator';
 
 @Controller('room')
 @ApiTags('Room')
@@ -22,8 +24,8 @@ export class RoomController {
 
   @ClassSerializer(Room)
   @Post('/')
-  @Permissions('admin')
-  @WithPermission()
+  @Roles("admin", 'worker')
+  @WithRole()
   @ApiResponse({ type: Room })
   createRoom(
     @Body() newsDto: CreateRoomDto,
@@ -35,6 +37,8 @@ export class RoomController {
   @Put('/:id')
   @WithAuth()
   @ApiResponse({ type: Room })
+  @Roles("admin", 'worker')
+  @WithRole()
   @ApiParam({
     name: "id",
     type: String,
@@ -51,6 +55,8 @@ export class RoomController {
   @ClassSerializer(Room)
   @Get('/:id')
   @WithAuth()
+  @Roles("admin", 'worker')
+  @WithRole()
   @ApiResponse({ type: Room })
   getRoomById(@Param('id') name: string): Promise<Room> {
     return this.roomService.getById(name)
@@ -65,6 +71,8 @@ export class RoomController {
     required: false,
     isArray: true
   })
+  @Roles("admin", 'worker')
+  @WithRole()
   @ApiResponse({ type: [Room] })
   getAllRoomsByIds(
     @Query() {ids}:  {ids?: string[]}
@@ -87,6 +95,8 @@ export class RoomController {
     type: String,
     required: false,
   })
+  @Roles("admin", 'worker')
+  @WithRole()
   addUserToBlock(
     @Body() blockSanitaryVisitDto: AddUserToRoomDto,
     @Param() id: string,
@@ -97,6 +107,8 @@ export class RoomController {
   @ClassSerializer(Room)
   @Delete('/user/:id')
   @WithAuth()
+  @Roles("admin", 'worker')
+  @WithRole()
   @ApiResponse({ type: Room })
   @ApiParam({
     name: "id",

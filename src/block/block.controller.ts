@@ -14,6 +14,8 @@ import { BlockSanitaryMark } from './entities/blockSanitaryMark.entity';
 import { UpdateBlockSanitaryMarkDto } from './dto/updateBlockSanitaryMark.dto';
 import { AddUserToBlockDto } from './dto/addUserToBlock.dto';
 import { DeleteUserFromBlock } from './dto/deleteUserFromBlock.dto';
+import { Roles } from 'src/decorators/roles.decorator';
+import { WithRole } from 'src/decorators/withRoles.decorator';
 
 @Controller('block')
 @ApiTags('Block')
@@ -28,6 +30,8 @@ export class BlockController {
   @Post('/')
   @WithAuth()
   @ApiResponse({ type: Block })
+  @Roles("admin")
+  @WithRole()
   createBlock(
     @Body() blockDto: CreateBlockDto,
   ): Promise<Block> {
@@ -38,6 +42,8 @@ export class BlockController {
   @Put('/:id')
   @WithAuth()
   @ApiResponse({ type: Block })
+  @Roles("admin", 'worker')
+  @WithRole()
   @ApiParam({
     name: "id",
     type: String,
@@ -54,6 +60,8 @@ export class BlockController {
   @ClassSerializer(Block)
   @Get('/:id')
   @WithAuth()
+  @Roles("admin", 'worker', 'user', 'student')
+  @WithRole()
   @ApiResponse({ type: Block })
   getBlockById(@Param('id') name: string): Promise<Block> {
     return this.blockService.getById(name)
@@ -93,6 +101,8 @@ export class BlockController {
     type: String,
     required: false,
   })
+  @Roles("admin", 'worker', 'user', 'student')
+  @WithRole()
   @ApiResponse({ type: [Block] })
   async getAllBlocksByIds( 
     @Query('ids') ids?: string[],
@@ -124,6 +134,8 @@ export class BlockController {
   @ClassSerializer(BlockSanitaryVisit)
   @Post('/sanitaryVisit')
   @WithAuth()
+  @Roles("admin", 'worker')
+  @WithRole()
   @ApiResponse({ type: BlockSanitaryVisit })
   createBlockSanitaryVisit(
     @Body() blockSanitaryVisitDto: CreateBlockSanitaryVisitDto,
@@ -134,6 +146,8 @@ export class BlockController {
   @ClassSerializer(BlockSanitaryVisit)
   @Put('/sanitaryVisit/:id')
   @WithAuth()
+  @Roles("admin", 'worker')
+  @WithRole()
   @ApiResponse({ type: BlockSanitaryVisit })
   @ApiParam({
     name: "id",
@@ -150,6 +164,8 @@ export class BlockController {
   @ClassSerializer(BlockSanitaryMark)
   @Put('/sanitaryMark/:id')
   @WithAuth()
+  @Roles("admin", 'worker')
+  @WithRole()
   @ApiResponse({ type: BlockSanitaryMark })
   @ApiParam({
     name: "id",
@@ -166,6 +182,8 @@ export class BlockController {
   @ClassSerializer(BlockSanitaryVisit)
   @Get('/sanitaryVisit/:id')
   @WithAuth()
+  @Roles("admin", 'worker', 'student', 'user')
+  @WithRole()
   @ApiResponse({ type: BlockSanitaryVisit })
   getBlockSanitaryVisits(@Param('id') blockId: string): Promise<BlockSanitaryVisit[]> {
     return this.blockService.getBlockSanitaryVisits(blockId)
@@ -176,6 +194,8 @@ export class BlockController {
   @ApiParam({
     name: 'id',
   })
+  @Roles("admin")
+  @WithRole()
   @ApiResponse({ type: BlockSanitaryVisit })
   deleteBlock(
     @Param() id: string,
@@ -187,6 +207,8 @@ export class BlockController {
   @ClassSerializer(Block)
   @Put('/user/:id')
   @WithAuth()
+  @Roles("admin", 'worker')
+  @WithRole()
   @ApiResponse({ type: Block })
   @ApiParam({
     name: "id",
@@ -209,6 +231,8 @@ export class BlockController {
     type: String,
     required: false,
   })
+  @Roles("admin", 'worker')
+  @WithRole()
   deleteUserFromBlock(
     @Body() blockSanitaryVisitDto: DeleteUserFromBlock,
     @Param() id: string,

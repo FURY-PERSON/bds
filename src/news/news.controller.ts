@@ -12,6 +12,8 @@ import { Response as Res } from 'express';
 import { NewsType } from './types/types';
 import { Feedback } from 'src/feedback/feedback.entity';
 import { CreateFeedbackDto } from 'src/feedback/dto/createFeedback.dto';
+import { Roles } from 'src/decorators/roles.decorator';
+import { WithRole } from 'src/decorators/withRoles.decorator';
 
 @ApiTags('News')
 @Controller('news')
@@ -27,6 +29,8 @@ export class NewsController {
   @UseInterceptors(FileInterceptor('image'))
   @ApiConsumes('multipart/form-data')
   @ApiResponse({ type: News })
+  @Roles("admin", 'worker')
+  @WithRole()
   @WithAuth()
   createNews(
     @Body() newsDto: CreateNewsDto,
@@ -47,6 +51,8 @@ export class NewsController {
   @ApiParam({
     name: 'id',
   })
+  @Roles("admin", 'worker')
+  @WithRole()
   @UseInterceptors(FileInterceptor('image'))
   @ApiConsumes('multipart/form-data')
   @WithAuth()
@@ -102,6 +108,8 @@ export class NewsController {
     type: String,
     required: false,
   })
+  @Roles("admin", 'worker', 'user', 'student')
+  @WithRole()
   @WithAuth()
   @ApiResponse({ type: [News] })
   async getAll(
@@ -133,6 +141,8 @@ export class NewsController {
   @ClassSerializer(News)
   @Get('/:id')
   @WithAuth()
+  @Roles("admin", 'worker', 'user', 'student')
+  @WithRole()
   @ApiResponse({ type: News })
   getById(@Param('id') login: string): Promise<News> {
     return this.newsService.getById(login)
@@ -143,6 +153,8 @@ export class NewsController {
   @ApiParam({
     name: 'id',
   })
+  @Roles("admin", 'worker', 'user', 'student')
+  @WithRole()
   @ApiResponse({ type: News })
   deleteComment(
     @Param() id: string,
@@ -154,6 +166,8 @@ export class NewsController {
   @Post('/feedback')
   @ApiResponse({ type: Feedback })
   @WithAuth()
+  @Roles("admin", 'worker', 'user', 'student')
+  @WithRole()
   createFeedbackForNews(
     @Body() feedbackDto: CreateFeedbackDto,
     @Req() { user }: RequestWithUser,
