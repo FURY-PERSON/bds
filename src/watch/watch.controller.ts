@@ -4,7 +4,7 @@ import { Body, Controller, Get, Param, Post, Put, Query, Req } from '@nestjs/com
 import { ClassSerializer } from 'src/serializers/class.serializer';
 import { Watch } from './watch.entity';
 import { CreateWatchDto } from './dto/createWatch.dto';
-import { UpdateWatchDto } from './dto/UpdateOptDto.dto';
+import { UpdateWatchDto } from './dto/updateOptDto.dto';
 import { RequestWithUser } from 'src/types/request-with-user.interface';
 import { WithAuth } from 'src/decorators/with-auth.decorator';
 
