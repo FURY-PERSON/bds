@@ -5,6 +5,8 @@ import { In, Repository } from 'typeorm';
 import { Dorm } from './dorms.entity';
 import { CreateDormDto } from './dto/createDorm.dto';
 import { UpdateDormDto } from './dto/updateDorm.dto';
+import { MessageProviderService } from 'src/messageProvider/messageProvider.service';
+import { MessageExchange, MessageRoute } from 'src/messageProvider/types';
 
 @Injectable()
 export class DormsService {
@@ -12,12 +14,19 @@ export class DormsService {
     @InjectRepository(Dorm)
     private dormRepository: Repository<Dorm>,
     private fileService: FilesService,
+    private messageProvider: MessageProviderService
     ) {
 
   }
 
   async createDorm(dormDto: CreateDormDto, image?: Express.Multer.File) {
     const dorm = this.dormRepository.create(dormDto);
+
+    this.messageProvider.sendMessage(MessageExchange.DEFAULT, MessageRoute.DORM_CREATE, {
+      id: dorm.id,
+      name: dorm.name,
+      reputationBound: dorm.reputationBound
+    })
 
     if(!image) {
       return this.dormRepository.save(dorm)
@@ -77,6 +86,12 @@ export class DormsService {
     }
 
     const updatedDorm = this.dormRepository.create({...dorm, ...newsDto})
+
+    this.messageProvider.sendMessage(MessageExchange.DEFAULT, MessageRoute.DORM_CREATE, {
+      id: updatedDorm.id,
+      name: updatedDorm.name,
+      reputationBound: updatedDorm.reputationBound
+    })
 
     if(!image) {
       return this.dormRepository.save(updatedDorm)

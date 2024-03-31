@@ -9,6 +9,7 @@ import { CreateUserDto } from 'src/users/dto/createUser.dto';
 import { AuthDto } from './dto/auth.dto';
 import { RefreshDto } from './dto/resresh.dto';
 import { Roles } from 'src/roles/types';
+import { MessageProviderService } from 'src/messageProvider/messageProvider.service';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +17,7 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private messageProvider: MessageProviderService
   ) {}
   async register(createUserDto: CreateUserDto) {
 

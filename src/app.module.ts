@@ -26,10 +26,12 @@ import { CommentModule } from './comment/comment.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { FeedbackModule } from './feedback/feedback.module';
 import { FeatureFlagModule } from './feature-flag/feature-flag.module';
+import { MessageProviderModule } from './messageProvider/messageProvider.module';
 
 @Module({
   controllers: [],
-  providers: [],
+  providers: [
+  ],
   imports: [
     ServeStaticModule.forRoot({
       rootPath: path.resolve(__dirname,  '..', 'static'),
@@ -63,6 +65,7 @@ import { FeatureFlagModule } from './feature-flag/feature-flag.module';
     NotificationsModule,
     FeedbackModule,
     FeatureFlagModule,
+    MessageProviderModule
   ],
 })
 export class AppModule {

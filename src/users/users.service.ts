@@ -10,7 +10,9 @@ import { UpdateUserDto } from './dto/updateUser.dto';
 import { User } from './entities/users.entity';
 import { GetAllUsersParam } from './types/types';
 import { FeatureFlagService } from 'src/feature-flag/feature-flag.service';
-import { rolePermissionsMap } from '../roles/constants/rolePermissionsMap';
+import { MessageProviderService } from 'src/messageProvider/messageProvider.service';
+import { MessageExchange, MessageRoute } from 'src/messageProvider/types';
+
 
 @Injectable()
 export class UsersService {
@@ -20,6 +22,7 @@ export class UsersService {
     private roleService: RolesService,
     private permissionService: PermissionsService,
     private featureFlagService: FeatureFlagService,
+    private messageProvider: MessageProviderService
     ) {
 
   }
@@ -52,6 +55,11 @@ export class UsersService {
     const permissions = await Promise.all(permissionPromises);
 
     createdUser.permissions = permissions;
+
+    this.messageProvider.sendMessage(MessageExchange.DEFAULT, MessageRoute.USER_CREATE, {
+      id: createdUser.id,
+      role: createdUser.role.name
+    })
 
     const savedUser = await this.usersRepository.save(createdUser);
 
@@ -211,6 +219,11 @@ export class UsersService {
 
       updatedUser.role = newRole
     }
+
+    this.messageProvider.sendMessage(MessageExchange.DEFAULT, MessageRoute.USER_CREATE, {
+      id: updatedUser.id,
+      role: updatedUser.role.name
+    })
 
     if(userDto.permissionsIds) {
       const oldPermissionsIds = user.permissions?.map((per) => per.id) || []

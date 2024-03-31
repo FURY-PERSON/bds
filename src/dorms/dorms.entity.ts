@@ -22,6 +22,10 @@ export class Dorm {
   phone: string
 
   @ApiProperty()
+  @Column({default: 100})
+  reputationBound: number
+
+  @ApiProperty()
   @Column()
   email: string
 

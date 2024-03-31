@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsNotEmpty, IsPhoneNumber, IsString, ValidateIf } from "class-validator";
+import { IsEmail, IsNotEmpty, IsNumber, IsPhoneNumber, IsString, ValidateIf } from "class-validator";
 
 export class UpdateDormDto {
   @IsNotEmpty()
@@ -25,6 +25,12 @@ export class UpdateDormDto {
   @ValidateIf(o => o.email)
   @ApiProperty({required: false})
   email?: string
+
+  @IsNotEmpty()
+  @ValidateIf(o => o.reputationBound)
+  @IsNumber()
+  @ApiProperty()
+  reputationBound?: number
 
   @ApiProperty({ type: 'string', format: 'binary', required: false})
   image?: Express.Multer.File;

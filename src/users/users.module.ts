@@ -7,10 +7,11 @@ import { User } from './entities/users.entity';
 import { UsersService } from './users.service';
 import { PermissionsModule } from 'src/permissions/permissions.module';
 import { FeatureFlagModule } from 'src/feature-flag/feature-flag.module';
+import { MessageProviderService } from 'src/messageProvider/messageProvider.service';
 
 @Module({
   controllers: [UsersController],
-  providers: [UsersService],
+  providers: [UsersService, MessageProviderService],
   imports: [
     TypeOrmModule.forFeature([User]),
     forwardRef(() => AuthModule),

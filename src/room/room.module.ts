@@ -5,9 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Room } from './room.entity';
 import { BlockModule } from 'src/block/block.module';
 import { UsersModule } from 'src/users/users.module';
+import { MessageProviderService } from 'src/messageProvider/messageProvider.service';
 
 @Module({
-  providers: [RoomService],
+  providers: [RoomService, MessageProviderService],
   controllers: [RoomController],
   imports: [
     TypeOrmModule.forFeature([Room]),

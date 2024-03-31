@@ -8,6 +8,8 @@ import { Room } from './room.entity';
 import { DeleteUserFromRoom } from './dto/deleteUserFromRoom.dto';
 import { AddUserToRoomDto } from './dto/addUserToRoom';
 import { UsersService } from 'src/users/users.service';
+import { MessageProviderService } from 'src/messageProvider/messageProvider.service';
+import { MessageExchange, MessageRoute } from 'src/messageProvider/types';
 
 @Injectable()
 export class RoomService {
@@ -15,7 +17,8 @@ export class RoomService {
     @InjectRepository(Room)
     private roomRepository: Repository<Room>,
     private blockService: BlockService,
-    private usersService: UsersService
+    private usersService: UsersService,
+    private messageProvider: MessageProviderService
     ) {
 
   }
@@ -33,6 +36,15 @@ export class RoomService {
       ...roomDto,
       block: block
     });
+
+    this.messageProvider.sendMessage(MessageExchange.DEFAULT, MessageRoute.ROOM_CREATE, {
+      id: room.id,
+      blockId: room.block.id,
+      capacity: room.peopleAmount,
+      dormId: room.block.dorm.id,
+      number: room.number,
+      subNumber: room.number
+    })
     
     return this.roomRepository.save(room);
   }
@@ -47,6 +59,15 @@ export class RoomService {
     }
 
     const updatedRoom = this.roomRepository.create({...room, ...roomDto}) 
+
+    this.messageProvider.sendMessage(MessageExchange.DEFAULT, MessageRoute.ROOM_CREATE, {
+      id: updatedRoom.id,
+      blockId: updatedRoom.block.id,
+      capacity: updatedRoom.peopleAmount,
+      dormId: updatedRoom.block.dorm.id,
+      number: updatedRoom.number,
+      subNumber: updatedRoom.number
+    })
 
     if(!roomDto.blockId) {
       return this.roomRepository.save(updatedRoom);  
