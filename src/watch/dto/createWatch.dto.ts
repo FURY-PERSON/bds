@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString, IsNumber, ValidateIf, IsEnum, IsDate, IsDateString } from "class-validator";
+import { IsNotEmpty, IsString, ValidateIf, IsEnum, IsDateString } from "class-validator";
 import { Column } from "typeorm";
 import { Shift, WatchStatus } from "../types/enums";
 

@@ -10,6 +10,7 @@ import { Feedback } from 'src/feedback/feedback.entity';
 import { FeatureFlag } from 'src/feature-flag/entities/featureFlag.entity';
 import { Room } from 'src/room/room.entity';
 import { Block } from 'src/block/entities/block.entity';
+import { ScientificWork } from 'src/scientificWorks/entities/scientificWorks.entity';
 
 @Entity({ name: "user" })
 export class User {
@@ -29,6 +30,12 @@ export class User {
     nullable: true
   })
   phone: string
+
+  @ApiProperty()
+  @Column({
+    nullable: true
+  })
+  averageMark?: number
 
   @ApiProperty()
   @Column()
@@ -82,6 +89,9 @@ export class User {
 
   @OneToMany(() => Notification, comment => comment.author)
   createdNotifications: Notification[]
+
+  @OneToMany(() => ScientificWork, scientificWork => scientificWork.user)
+  scientificWorks: ScientificWork[]
 
   @ManyToOne(() => Room, room => room.tenants)
   room: Room

@@ -27,6 +27,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { FeedbackModule } from './feedback/feedback.module';
 import { FeatureFlagModule } from './feature-flag/feature-flag.module';
 import { MessageProviderModule } from './messageProvider/messageProvider.module';
+import { ScientificWorksModule } from './scientificWorks/scientificWorks.module';
 
 @Module({
   controllers: [],
@@ -65,7 +66,8 @@ import { MessageProviderModule } from './messageProvider/messageProvider.module'
     NotificationsModule,
     FeedbackModule,
     FeatureFlagModule,
-    MessageProviderModule
+    MessageProviderModule,
+    ScientificWorksModule
   ],
 })
 export class AppModule {
