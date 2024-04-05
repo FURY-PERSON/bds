@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsNotEmpty, IsNumber, IsPhoneNumber, IsString, ValidateIf } from "class-validator";
+import { IsEmail, IsNotEmpty, IsNumber, IsNumberString, IsPhoneNumber, IsString, ValidateIf } from "class-validator";
 
 export class UpdateDormDto {
   @IsNotEmpty()
@@ -28,8 +28,8 @@ export class UpdateDormDto {
 
   @IsNotEmpty()
   @ValidateIf(o => o.reputationBound)
-  @IsNumber()
-  @ApiProperty()
+  @IsNumberString()
+  @ApiProperty({required: false})
   reputationBound?: number
 
   @ApiProperty({ type: 'string', format: 'binary', required: false})

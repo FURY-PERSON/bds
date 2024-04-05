@@ -4,7 +4,6 @@ import { IMessageProvider } from './messageProvider.interface';
 import { Message, MessageExchange, MessageRoute } from './types';
 
 
-
 @Injectable()
 export class RabbitMQService implements IMessageProvider {
   private readonly rabbitUrl = process.env.RABBITMQ_URL; 
@@ -13,6 +12,7 @@ export class RabbitMQService implements IMessageProvider {
     try {
       const connection = await amqp.connect(this.rabbitUrl);
       const channel = await connection.createChannel();
+      console.log(routingKey, message)
       await channel.publish(exchange, routingKey, Buffer.from(JSON.stringify(message)))
       await channel.close();
       await connection.close();

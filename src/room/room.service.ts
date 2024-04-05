@@ -36,22 +36,17 @@ export class RoomService {
       ...roomDto,
       block: block
     });
-
-    this.messageProvider.sendMessage(MessageExchange.DEFAULT, MessageRoute.ROOM_CREATE, {
-      id: room.id,
-      blockId: room.block.id,
-      capacity: room.peopleAmount,
-      dormId: room.block.dorm.id,
-      number: room.number,
-      subNumber: room.number
-    })
     
-    return this.roomRepository.save(room);
+    const roomEntity = await this.roomRepository.save(room);
+
+    this.sendUpdateRoomMessage(roomEntity.id)
+
+    return roomEntity
   }
 
-  async updateRoom(roomDto: UpdateRoomDto, id: string) {
+  async update(roomDto: UpdateRoomDto, id: string) {
     const room = await this.roomRepository.findOne({
-      where: { id }
+      where: { id },
     });
 
     if(!room) {
@@ -60,17 +55,12 @@ export class RoomService {
 
     const updatedRoom = this.roomRepository.create({...room, ...roomDto}) 
 
-    this.messageProvider.sendMessage(MessageExchange.DEFAULT, MessageRoute.ROOM_CREATE, {
-      id: updatedRoom.id,
-      blockId: updatedRoom.block.id,
-      capacity: updatedRoom.peopleAmount,
-      dormId: updatedRoom.block.dorm.id,
-      number: updatedRoom.number,
-      subNumber: updatedRoom.number
-    })
-
     if(!roomDto.blockId) {
-      return this.roomRepository.save(updatedRoom);  
+      const roomEntity = await this.roomRepository.save(updatedRoom);  
+
+      this.sendUpdateRoomMessage(roomEntity.id)
+
+      return roomEntity;
     }
     
     const block = await this.blockService.getById(roomDto.blockId);
@@ -81,7 +71,11 @@ export class RoomService {
 
     updatedRoom.block = block;
 
-    return this.roomRepository.save(updatedRoom);  
+    const roomEntity= await this.roomRepository.save(updatedRoom);  
+
+    this.sendUpdateRoomMessage(roomEntity.id, true)
+    
+    return roomEntity
   }
 
   async getById(id: string) {
@@ -199,5 +193,24 @@ export class RoomService {
     await this.blockService.deleteUserFromBlock({userLogin: deleteUserFromRoomDto.userLogin}, room.block.id);
 
     return await this.roomRepository.save(room)
+  }
+
+  private async sendUpdateRoomMessage(roomId: string, update?: boolean) {
+    const room = await this.roomRepository.findOne({where: {id: roomId}, relations: {block: true}});
+
+    if(!room) return;
+
+    const block = await this.blockService.getById(room.block.id);
+
+    if(!block) return;
+
+    this.messageProvider.sendMessage(MessageExchange.DEFAULT, update ? MessageRoute.ROOM_UPDATE :  MessageRoute.ROOM_CREATE, {
+      id: room.id,
+      blockId: block.id,
+      capacity: room.peopleAmount,
+      dormId: block.dorm.id,
+      number: room.number,
+      subNumber: room.subNumber
+    })
   }
 }

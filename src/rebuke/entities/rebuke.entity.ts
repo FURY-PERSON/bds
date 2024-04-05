@@ -9,7 +9,7 @@ export class Rebuke {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
-  @ApiProperty()
+  @ApiProperty({example: 'strong'})
   @Column()
   @IsNotEmpty()
   type: RebukeType

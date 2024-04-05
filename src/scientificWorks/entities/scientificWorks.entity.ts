@@ -14,7 +14,7 @@ export class ScientificWork {
   @IsNotEmpty()
   title: string;
 
-  @ApiProperty()
+  @ApiProperty({example: 'publication'})
   @Column()
   @IsNotEmpty()
   type: ScientificWorkType

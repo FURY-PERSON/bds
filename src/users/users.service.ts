@@ -12,6 +12,7 @@ import { GetAllUsersParam } from './types/types';
 import { FeatureFlagService } from 'src/feature-flag/feature-flag.service';
 import { MessageProviderService } from 'src/messageProvider/messageProvider.service';
 import { MessageExchange, MessageRoute } from 'src/messageProvider/types';
+import { Roles } from 'src/roles/types';
 
 
 @Injectable()
@@ -56,11 +57,6 @@ export class UsersService {
 
     createdUser.permissions = permissions;
 
-    this.messageProvider.sendMessage(MessageExchange.DEFAULT, MessageRoute.USER_CREATE, {
-      id: createdUser.id,
-      role: createdUser.role.name
-    })
-
     const savedUser = await this.usersRepository.save(createdUser);
 
     await this.featureFlagService.addFeatureFlagsToUser(savedUser);
@@ -70,7 +66,24 @@ export class UsersService {
         login: userDto.login
       },
       relations: {
-        featureFlags: true
+        featureFlags: true,
+        rebukes: true,
+        scientificWorks: true
+      }
+    })
+
+
+    this.messageProvider.sendMessage(MessageExchange.DEFAULT, MessageRoute.USER_CREATE, {
+      id: savedUser.id,
+      role: savedUser.role.name
+    }).then(() => {
+      if(savedUser.role.name === Roles.STUDENT) {
+        this.messageProvider.sendMessage(MessageExchange.DEFAULT, MessageRoute.STUDENT_CREATE, {
+          id: savedUser.id,
+          course: savedUser.course,
+          onBudget: savedUser.budget,
+          averageMark: savedUser.averageMark
+        })
       }
     })
 
@@ -153,7 +166,9 @@ export class UsersService {
         notifications: relations,
         featureFlags: relations,
         room: relations,
-        block: relations
+        block: relations,
+        rebukes: relations,
+        scientificWorks: relations
       }
     });
     
@@ -208,6 +223,7 @@ export class UsersService {
       phone: userDto.phone ?? user.phone,
       email: userDto.email ?? user.email,
       refreshToken: userDto.refreshToken ?? user.refreshToken,
+      averageMark: userDto.averageMark ?? user.averageMark,
     })
 
     if(userDto.roleName && user.role.name !== userDto.roleName) {
@@ -234,7 +250,23 @@ export class UsersService {
       updatedUser.permissions = newPermissions
     }
 
-    return this.usersRepository.save(updatedUser)
+    const userEntity = await this.usersRepository.save(updatedUser)
+
+    this.messageProvider.sendMessage(MessageExchange.DEFAULT, MessageRoute.USER_UPDATE, {
+      id: userEntity.id,
+      role: userEntity.role.name
+    }).then(() => {
+      if(userEntity.role.name === Roles.STUDENT) {
+        this.messageProvider.sendMessage(MessageExchange.DEFAULT, MessageRoute.STUDENT_UPDATE, {
+          id: userEntity.id,
+          course: userEntity.course,
+          onBudget: userEntity.budget,
+          averageMark: userEntity.averageMark,
+        })
+      }
+    })
+
+    return userEntity
   }
 
   async getAllWithoutFilters() {

@@ -33,6 +33,16 @@ export class User {
   phone: string
 
   @ApiProperty()
+  @Column({default: 1})
+  course: number
+
+  @ApiProperty()
+  @Column({
+    nullable: true
+  })
+  budget: boolean
+
+  @ApiProperty()
   @Column({
     nullable: true
   })

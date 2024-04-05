@@ -199,7 +199,7 @@ export class BlockController {
   @ApiResponse({ type: BlockSanitaryVisit })
   deleteBlock(
     @Param() id: string,
-  ): Promise<BlockSanitaryVisit> {
+  ): Promise<void> {
     return this.blockService.deleteSanitaryVisitById(id)
   }
 

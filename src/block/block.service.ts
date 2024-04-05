@@ -15,6 +15,8 @@ import { UpdateBlockSanitaryMarkDto } from './dto/updateBlockSanitaryMark.dto';
 import { AddUserToBlockDto } from './dto/addUserToBlock.dto';
 import { UsersService } from 'src/users/users.service';
 import { DeleteUserFromBlock } from './dto/deleteUserFromBlock.dto';
+import { MessageProviderService } from 'src/messageProvider/messageProvider.service';
+import { MessageExchange, MessageRoute } from 'src/messageProvider/types';
 
 @Injectable()
 export class BlockService {
@@ -26,7 +28,8 @@ export class BlockService {
     @InjectRepository(Block)
     private blockRepository: Repository<Block>,
     private dormService: DormsService,
-    private usersService: UsersService
+    private usersService: UsersService,
+    private messageProvider: MessageProviderService
     ) {
 
   }
@@ -175,6 +178,7 @@ export class BlockService {
       
     }
 
+    this.sendUpdateBlockTenantsMarksMessage(block.id);
     
     return this.blockSanitaryVisitRepository.findOne({
       where: {
@@ -201,6 +205,11 @@ export class BlockService {
       date: updateBlockSanitaryVisit.date ?? blockSanitaryVisit.date
     })  
 
+    this.blockSanitaryVisitRepository.findOne({where: {id: blockSanitaryVisit.id}, relations: {block: true}}).then((visit) => {
+      this.sendUpdateBlockTenantsMarksMessage(visit.block.id)
+    })
+
+
     return this.blockSanitaryVisitRepository.findOne({
       where: {
         id: id
@@ -214,17 +223,26 @@ export class BlockService {
 
   async updateBlockSanitaryMark(updateBlockSanitaryMark: UpdateBlockSanitaryMarkDto, id: string) {
     const blockSanitaryMark = await this.blockSanitaryMarkRepository.findOne({
-      where: { id }
+      where: { id },
+      relations: {
+        visit: true
+      }
     });
     
     if(!blockSanitaryMark) {
       throw new HttpException('Mark not found', HttpStatus.NOT_FOUND)
     }
 
-    return await this.blockSanitaryMarkRepository.save({
+    const mark = await this.blockSanitaryMarkRepository.save({
       ...blockSanitaryMark,
       mark: updateBlockSanitaryMark.mark || null
     })  
+
+    this.blockSanitaryVisitRepository.findOne({where: {id: blockSanitaryMark.visit.id}, relations: {block: true}}).then((visit) => {
+      this.sendUpdateBlockTenantsMarksMessage(visit.block.id)
+    })
+
+    return mark
   }
 
   async addUserToBlock(addUserToBlockDto: AddUserToBlockDto, id: string) {
@@ -282,7 +300,9 @@ export class BlockService {
       throw new NotFoundException(`Sanitary Visit id: ${id} not found`)
     }
 
-    return await this.blockSanitaryVisitRepository.remove(sanitaryVisit)
+    await this.blockSanitaryVisitRepository.remove(sanitaryVisit)
+
+    return;
   }
 
   async deleteUserFromBlock(deleteUserFromBlockDto: DeleteUserFromBlock, id: string) {
@@ -307,6 +327,62 @@ export class BlockService {
 
     block.tenants = newTenants;
 
-    return await this.blockRepository.save(block)
+    const blockEntity = await this.blockRepository.save(block);
+
+    this.messageProvider.sendMessage(MessageExchange.DEFAULT, MessageRoute.STUDENT_UPDATE, {
+      id: userToDelete.id,
+      blockSanitaryConditionMark: null,
+    })
+
+    return blockEntity
+  }
+
+  private async sendUpdateBlockTenantsMarksMessage(blockId: string) {
+    const block = await this.blockRepository.findOne({
+      where: { id: blockId },
+      relations: {
+        tenants: true
+      }
+    });
+
+    if(!block) return;
+
+    block.tenants.forEach((tenant) => {
+      this.updateUserAverageSanitaryVisitMark(tenant.login)
+    })
+  }
+
+  private async updateUserAverageSanitaryVisitMark(userLogin: string) {
+    const user = await this.usersService.getByLogin(userLogin);
+
+    const userSanitaryVisits = await this.blockSanitaryVisitRepository.find({
+      where: {
+        block: {
+          id: user.block.id
+        }
+      },
+      relations: {
+       marks: true,
+       block: true
+      }
+    });
+
+    const blockSanitaryConditionMarks = userSanitaryVisits.reduce<BlockSanitaryMark[]>((accum, visit) => [...accum, ...visit.marks.reduce((accum, mark) => {
+      if(mark.mark !== null) {
+        return [...accum, mark]
+      }
+
+      return accum
+    }, [])], [])
+
+    if(blockSanitaryConditionMarks.length === 0) {
+      return;
+    }
+
+    this.messageProvider.sendMessage(MessageExchange.DEFAULT, MessageRoute.STUDENT_UPDATE, {
+      id: user.id,
+      blockSanitaryConditionMark: blockSanitaryConditionMarks.reduce((accum, mark) => accum + mark.mark, 0) / blockSanitaryConditionMarks.length,
+    })
+
   }
 }

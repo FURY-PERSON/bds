@@ -1,3 +1,4 @@
+import { RebukeType } from "src/rebuke/type/rebuke";
 import { Roles } from "src/roles/types";
 
 export enum MessageExchange {
@@ -11,6 +12,8 @@ export enum MessageRoute {
   USER_UPDATE = 'user.updated',
   ROOM_CREATE = 'room.created',
   ROOM_UPDATE = 'room.updated',
+  STUDENT_CREATE = 'student.created',
+  STUDENT_UPDATE = 'student.updated',
 }
 
 type MessageBase <T extends MessageRoute> = {route: T}
@@ -55,6 +58,51 @@ export type MessageRoomCreate =  MessageBase<MessageRoute.ROOM_CREATE> & {
   capacity: number;
 }
 
-export type MessageWithRoute<T extends MessageRoute> =  MessageBase<T> & (MessageDormCreate | MessageDormUpdate | MessageUserUpdate | MessageUserCreate | MessageRoomUpdate | MessageRoomCreate)
+enum ScientificWorkType { PUBLICATION = 'publication', OLYMPIAD = 'olympiad' } 
+
+enum BenefitType {
+  DISABLED_PERSON = 'disabled_person',
+  CHERNOBYL = 'chernobyl',
+  ORPHAN = 'orphan',
+  TALENTED = 'talented',
+  FOREIGNER = 'foreigner',
+}
+
+
+type ScientificWork = {
+  type: ScientificWorkType;
+  date: Date;
+}
+
+type Rebuke = {
+  type: RebukeType;
+  startDate: Date;
+  endDate: Date;
+}
+
+
+export type MessageStudentUpdate =  MessageBase<MessageRoute.STUDENT_UPDATE> & {
+  id: string;
+  onBudget?: boolean;
+  course?: number;
+  averageMark?: number | null;
+  blockSanitaryConditionMark?: number | null,
+  rebukes?: Rebuke[] | null;
+  scientificWorks?:ScientificWork[] | null;
+  benefits?: BenefitType[] | null;
+}
+
+export type MessageStudentCreate =  MessageBase<MessageRoute.STUDENT_CREATE> & {
+  id: string;
+  onBudget: boolean;
+  course: number;
+  averageMark?: number | null;
+  blockSanitaryConditionMark?: number | null,
+  rebukes?: Rebuke[] | null;
+  scientificWorks?: ScientificWork[] | null;
+  benefits?: BenefitType[] | null;
+}
+
+export type MessageWithRoute<T extends MessageRoute> =  MessageBase<T> & (MessageDormCreate | MessageDormUpdate | MessageUserUpdate | MessageUserCreate | MessageRoomUpdate | MessageRoomCreate | MessageStudentUpdate | MessageStudentCreate)
 
 export type Message<T extends MessageRoute> = Omit<MessageWithRoute<T>, 'route'>

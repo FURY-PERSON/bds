@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsString, IsPhoneNumber, ValidateIf, IsEnum, IsNumber, Min, Max } from "class-validator";
+import { IsEmail, IsString, IsPhoneNumber, ValidateIf, IsEnum, IsNumber, Min, Max, IsBoolean } from "class-validator";
 import { Roles } from "src/roles/types";
 
 export class UpdateUserDto {
@@ -14,9 +14,19 @@ export class UpdateUserDto {
   lastName?: string;
 
   @ApiProperty()
+  @IsNumber()
+  @ValidateIf(o => o.course)
+    course?: number;
+
+  @ApiProperty()
   @IsPhoneNumber()
   @ValidateIf(o => o.phone)
   phone?: string
+
+  @ApiProperty()
+  @IsBoolean()
+  @ValidateIf(o => o.budget)
+  budget?: boolean
 
   @ApiProperty()
   @ValidateIf(o => o.email)

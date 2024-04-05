@@ -7,10 +7,11 @@ import { Block } from './entities/block.entity';
 import { BlockSanitaryVisit } from './entities/blockSanitaryVisit.entity';
 import { BlockSanitaryMark } from './entities/blockSanitaryMark.entity';
 import { UsersModule } from 'src/users/users.module';
+import { MessageProviderService } from 'src/messageProvider/messageProvider.service';
 
 @Module({
   controllers: [BlockController],
-  providers: [BlockService],
+  providers: [BlockService, MessageProviderService],
   exports: [BlockService],
   imports: [
     TypeOrmModule.forFeature([Block, BlockSanitaryVisit, BlockSanitaryMark]),

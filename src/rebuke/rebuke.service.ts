@@ -6,6 +6,7 @@ import { MessageProviderService } from 'src/messageProvider/messageProvider.serv
 import { UsersService } from 'src/users/users.service';
 import { CreateRebukeDto } from './dto/createRebuke.dto';
 import { UpdateRebuke } from './dto/updateRebuke.dto';
+import { MessageExchange, MessageRoute } from 'src/messageProvider/types';
 
 
 @Injectable()
@@ -33,16 +34,12 @@ export class RebukeService {
       user: user
     });
 
-/*     this.messageProvider.sendMessage(MessageExchange.DEFAULT, MessageRoute.ROOM_CREATE, {
-      id: room.id,
-      blockId: room.block.id,
-      capacity: room.peopleAmount,
-      dormId: room.block.dorm.id,
-      number: room.number,
-      subNumber: room.number
-    }) */
-    
-    return this.rebukeRepository.save(rebuke);
+
+    const rebukeEntity = await this.rebukeRepository.save(rebuke);
+
+    this.updateUserRebukes(user.login)
+
+    return rebukeEntity
   }
 
   async updateRebuke(rebukeDto: UpdateRebuke, id: string) {
@@ -56,16 +53,11 @@ export class RebukeService {
 
     const updatedScientificWork= this.rebukeRepository.create({...rebuke, ...rebukeDto}) 
 
-/*     this.messageProvider.sendMessage(MessageExchange.DEFAULT, MessageRoute.ROOM_CREATE, {
-      id: updatedRoom.id,
-      blockId: updatedRoom.block.id,
-      capacity: updatedRoom.peopleAmount,
-      dormId: updatedRoom.block.dorm.id,
-      number: updatedRoom.number,
-      subNumber: updatedRoom.number
-    }) */
+    const rebukeEntity = await this.rebukeRepository.save(updatedScientificWork)
 
-    return this.rebukeRepository.save(updatedScientificWork);  
+    this.updateUserRebukes(rebukeEntity.user.login)
+
+    return rebukeEntity;  
   }
 
   async getById(id: string) {
@@ -116,5 +108,20 @@ export class RebukeService {
     }
 
     await this.rebukeRepository.remove(rebuke)
+  }
+
+  private async updateUserRebukes(userLogin: string) {
+    const user = await this.usersService.getByLogin(userLogin);
+
+    if(!user) return;
+
+    this.messageProvider.sendMessage(MessageExchange.DEFAULT, MessageRoute.STUDENT_UPDATE, {
+      id: user.id,
+      rebukes: user.rebukes?.map((rebuke) => ({
+        endDate: rebuke.endDate,
+        startDate: rebuke.startDate,
+        type: rebuke.type
+      }))
+    })
   }
 }

@@ -33,16 +33,11 @@ export class ScientificWorksService {
       user: user
     });
 
-/*     this.messageProvider.sendMessage(MessageExchange.DEFAULT, MessageRoute.ROOM_CREATE, {
-      id: room.id,
-      blockId: room.block.id,
-      capacity: room.peopleAmount,
-      dormId: room.block.dorm.id,
-      number: room.number,
-      subNumber: room.number
-    }) */
+    const scientificWorkEntity = await this.scientificWorkRepository.save(scientificWork)
+
+    this.updateUserScientificWorks(user.login)
     
-    return this.scientificWorkRepository.save(scientificWork);
+    return scientificWorkEntity;
   }
 
   async updateScientificWork(scientificWorkDto: UpdateScientificWorksDto, id: string) {
@@ -56,17 +51,14 @@ export class ScientificWorksService {
 
     const updatedScientificWork= this.scientificWorkRepository.create({...scientificWork, ...scientificWorkDto}) 
 
-/*     this.messageProvider.sendMessage(MessageExchange.DEFAULT, MessageRoute.ROOM_CREATE, {
-      id: updatedRoom.id,
-      blockId: updatedRoom.block.id,
-      capacity: updatedRoom.peopleAmount,
-      dormId: updatedRoom.block.dorm.id,
-      number: updatedRoom.number,
-      subNumber: updatedRoom.number
-    }) */
+
 
     if(!scientificWorkDto.creatorLogin) {
-      return this.scientificWorkRepository.save(updatedScientificWork);  
+      const scientificWorkEntity = await this.scientificWorkRepository.save(updatedScientificWork);
+
+      this.updateUserScientificWorks(scientificWorkEntity.user.login)
+
+      return scientificWorkEntity;  
     }
     
     const user = await this.usersService.getByLogin(scientificWorkDto.creatorLogin);
@@ -78,7 +70,11 @@ export class ScientificWorksService {
 
     updatedScientificWork.user = user;
 
-    return this.scientificWorkRepository.save(updatedScientificWork);  
+    const scientificWorkEntity = await this.scientificWorkRepository.save(updatedScientificWork);
+
+    this.updateUserScientificWorks(user.login)
+
+    return scientificWorkEntity;  
   }
 
   async getById(id: string) {
@@ -129,5 +125,19 @@ export class ScientificWorksService {
     }
 
     await this.scientificWorkRepository.remove(scientificWork)
+  }
+
+  private async updateUserScientificWorks(userLogin: string) {
+    const user = await this.usersService.getByLogin(userLogin);
+
+    if(!user) return;
+
+    this.messageProvider.sendMessage(MessageExchange.DEFAULT, MessageRoute.STUDENT_UPDATE, {
+      id: user.id,
+      scientificWorks: user.scientificWorks?.map((scientificWork) => ({
+        date: scientificWork.date,
+        type: scientificWork.type
+      }))
+    })
   }
 }

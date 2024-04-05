@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsNotEmpty, IsNumber, IsPhoneNumber, IsString } from "class-validator";
+import { IsEmail, IsNotEmpty, IsNumber, IsNumberString, IsPhoneNumber, IsString } from "class-validator";
 
 export class CreateDormDto {
   @IsNotEmpty()
@@ -23,7 +23,7 @@ export class CreateDormDto {
   email: string
 
   @IsNotEmpty()
-  @IsNumber()
+  @IsNumberString()
   @ApiProperty()
   reputationBound: number
 

@@ -22,14 +22,12 @@ export class DormsService {
   async createDorm(dormDto: CreateDormDto, image?: Express.Multer.File) {
     const dorm = this.dormRepository.create(dormDto);
 
-    this.messageProvider.sendMessage(MessageExchange.DEFAULT, MessageRoute.DORM_CREATE, {
-      id: dorm.id,
-      name: dorm.name,
-      reputationBound: dorm.reputationBound
-    })
-
     if(!image) {
-      return this.dormRepository.save(dorm)
+      const dormEntity = await this.dormRepository.save(dorm);
+
+      this.sendUpdateDormMessage(dormEntity.id)
+
+      return dormEntity
     }
 
     const {fileName, fileUrl} = await this.fileService.createFile(image);
@@ -38,7 +36,11 @@ export class DormsService {
       dorm.imageUrl = fileUrl;
     }
 
-    return this.dormRepository.save(dorm);
+    const dormEntity = await this.dormRepository.save(dorm);
+
+    this.sendUpdateDormMessage(dormEntity.id)
+
+    return dormEntity
   }
 
   async getAllDorms() {
@@ -74,7 +76,7 @@ export class DormsService {
     return dorm;
   }
 
-  async updateDormByName(id: string, newsDto: UpdateDormDto, image?: Express.Multer.File) {
+  async updateDormByName(id: string, dormDto: UpdateDormDto, image?: Express.Multer.File) {
     const dorm = await this.dormRepository.findOne({
       where: {
         id
@@ -85,16 +87,15 @@ export class DormsService {
       throw new NotFoundException('Dorm doesn`t exist')
     }
 
-    const updatedDorm = this.dormRepository.create({...dorm, ...newsDto})
+    const updatedDorm = this.dormRepository.create({...dorm, ...dormDto})
 
-    this.messageProvider.sendMessage(MessageExchange.DEFAULT, MessageRoute.DORM_CREATE, {
-      id: updatedDorm.id,
-      name: updatedDorm.name,
-      reputationBound: updatedDorm.reputationBound
-    })
 
     if(!image) {
-      return this.dormRepository.save(updatedDorm)
+      const dormEntity = await this.dormRepository.save(updatedDorm);
+
+      this.sendUpdateDormMessage(dormEntity.id)
+
+      return dormEntity
     }
 
     const {fileName, fileUrl} = await this.fileService.createFile(image);
@@ -103,7 +104,11 @@ export class DormsService {
       updatedDorm.imageUrl = fileUrl;
     }
 
-    return this.dormRepository.save(updatedDorm);
+    const dormEntity = await this.dormRepository.save(updatedDorm);
+
+    this.sendUpdateDormMessage(dormEntity.id, true)
+
+    return dormEntity
   }
 
   async deleteById(id: string) {
@@ -116,5 +121,21 @@ export class DormsService {
     }
 
     return await this.dormRepository.remove(dorm)
+  }
+
+  private async sendUpdateDormMessage(dormId: string, update?: boolean) {
+    const dorm = await this.dormRepository.findOne({
+      where: {
+        id: dormId
+      }
+    });
+
+    if(!dorm) return;
+
+    this.messageProvider.sendMessage(MessageExchange.DEFAULT, update ? MessageRoute.DORM_UPDATE : MessageRoute.DORM_CREATE, {
+      id: dorm.id,
+      name: dorm.name,
+      reputationBound: dorm.reputationBound
+    })
   }
 }

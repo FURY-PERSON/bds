@@ -48,7 +48,7 @@ export class RoomController {
     @Body() blockDto: UpdateRoomDto,
     @Param() id: string,
   ): Promise<Room> {
-    return this.roomService.updateRoom(blockDto, id)
+    return this.roomService.update(blockDto, id)
   }
 
 
