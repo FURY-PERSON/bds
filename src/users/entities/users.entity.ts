@@ -11,6 +11,7 @@ import { FeatureFlag } from 'src/feature-flag/entities/featureFlag.entity';
 import { Room } from 'src/room/room.entity';
 import { Block } from 'src/block/entities/block.entity';
 import { ScientificWork } from 'src/scientificWorks/entities/scientificWorks.entity';
+import { Rebuke } from 'src/rebuke/entities/rebuke.entity';
 
 @Entity({ name: "user" })
 export class User {
@@ -92,6 +93,9 @@ export class User {
 
   @OneToMany(() => ScientificWork, scientificWork => scientificWork.user)
   scientificWorks: ScientificWork[]
+
+  @OneToMany(() => Rebuke, rebuke => rebuke.user)
+  rebukes: Rebuke[]
 
   @ManyToOne(() => Room, room => room.tenants)
   room: Room

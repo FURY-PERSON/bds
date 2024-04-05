@@ -56,8 +56,6 @@ export class ScientificWorksService {
 
     const updatedScientificWork= this.scientificWorkRepository.create({...scientificWork, ...scientificWorkDto}) 
 
-    console.log('updatedScientificWork', updatedScientificWork)
-
 /*     this.messageProvider.sendMessage(MessageExchange.DEFAULT, MessageRoute.ROOM_CREATE, {
       id: updatedRoom.id,
       blockId: updatedRoom.block.id,

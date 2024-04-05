@@ -80,7 +80,7 @@ export class ScientificWorksController {
     type: String,
     required: false,
   })
-  deleteUserFromBlock(
+  deleteScientificWork(
     @Param() id: string,
   ): Promise<void> {
     return this.scientificWorksService.deleteByID(id)
