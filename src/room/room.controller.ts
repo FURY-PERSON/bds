@@ -55,7 +55,7 @@ export class RoomController {
   @ClassSerializer(Room)
   @Get('/:id')
   @WithAuth()
-  @Roles("admin", 'worker')
+  @Roles("admin", 'worker', 'student', 'user')
   @WithRole()
   @ApiResponse({ type: Room })
   getRoomById(@Param('id') name: string): Promise<Room> {
