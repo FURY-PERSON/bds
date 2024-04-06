@@ -51,7 +51,7 @@ export class ScientificWorksController {
   @ClassSerializer(ScientificWork)
   @Get('/:id')
   @WithAuth()
-  @Roles("admin", 'worker')
+  @Roles("admin", 'worker', 'student', 'user')
   @WithRole()
   @ApiResponse({ type: ScientificWork })
   getScientificWorkById(@Param('id') name: string): Promise<ScientificWork> {
@@ -61,7 +61,7 @@ export class ScientificWorksController {
   @ClassSerializer(ScientificWork)
   @Get('user/:login')
   @WithAuth()
-  @Roles("admin", 'worker')
+  @Roles("admin", 'worker', 'student', 'user')
   @WithRole()
   @ApiResponse({ type: [ScientificWork] })
   getScientificWorksByUser(@Param('login') login: string): Promise<ScientificWork[]> {

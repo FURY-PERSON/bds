@@ -51,7 +51,7 @@ export class RebukeController {
   @ClassSerializer(Rebuke)
   @Get('/:id')
   @WithAuth()
-  @Roles("admin", 'worker')
+  @Roles("admin", 'worker', 'student', 'user')
   @WithRole()
   @ApiResponse({ type: Rebuke })
   getRebukeById(@Param('id') id: string): Promise<Rebuke> {
@@ -61,7 +61,7 @@ export class RebukeController {
   @ClassSerializer(Rebuke)
   @Get('user/:login')
   @WithAuth()
-  @Roles("admin", 'worker')
+  @Roles("admin", 'worker', 'student', 'user')
   @WithRole()
   @ApiResponse({ type: [Rebuke] })
   getRebukesByUser(@Param('login') login: string): Promise<Rebuke[]> {
