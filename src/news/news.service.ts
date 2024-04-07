@@ -35,7 +35,7 @@ export class NewsService {
 
   }
 
-  async createNews(newsDto: CreateNewsDto, authorLogin: string, image?: Express.Multer.File) {
+  async createNews(newsDto: CreateNewsDto, authorLogin: string, images?: Express.Multer.File[]) {
     const {dormId} = newsDto;
     const dorm = await this.dormService.getById(dormId);
 
@@ -58,25 +58,35 @@ export class NewsService {
 
     news.blocks = []
 
+    const mainImage = images.find((image) => image.fieldname == 'mainImage') as Express.Multer.File | undefined
+
     for(let i =0; i<newsDto.blocks.length; i++) {
-      const blockEntity = await this.createNewsBlock(newsDto.blocks[i])
-      news.blocks.push(blockEntity)
+      const block = newsDto.blocks[i];
+
+      const blockImage = images.find((image) => image.fieldname == String(block.sequenceNumber))  as Express.Multer.File | undefined
+
+      if(blockImage) {
+        const {fileUrl} = await this.fileService.createFile(blockImage);
+        const blockEntity = await this.createNewsBlock(block, fileUrl)
+        news.blocks.push(blockEntity)
+      } else {
+        const blockEntity = await this.createNewsBlock(block)
+        news.blocks.push(blockEntity)
+      }
     }
 
-    if(!image) {
-      return this.newsRepository.save(news);
-    }
-    
-    const {fileName, fileUrl} = await this.fileService.createFile(image);
-    if(fileName && fileUrl) {
-      news.imageName = fileName;
-      news.imageUrl = fileUrl;
+    if(mainImage) {
+      const {fileName, fileUrl} = await this.fileService.createFile(mainImage);
+      if(fileName && fileUrl) {
+        news.imageName = fileName;
+        news.imageUrl = fileUrl;
+      }
     }
 
     return this.newsRepository.save(news);
   }
 
-  async updateNews(newsDto: UpdateNewsDto, id: string, image?: Express.Multer.File) {
+  async updateNews(newsDto: UpdateNewsDto, id: string, images?: Express.Multer.File[]) {
     const news = await this.newsRepository.findOne({
       where: { id }
     });
@@ -96,8 +106,18 @@ export class NewsService {
       updatedNews.blocks = []
   
       for(let i =0; i<newsDto.blocks.length; i++) {
-        const blockEntity = await this.createNewsBlock(newsDto.blocks[i])
-        updatedNews.blocks.push(blockEntity)
+        const block = newsDto.blocks[i];
+  
+        const blockImage = images.find((image) => image.fieldname == String(block.sequenceNumber))  as Express.Multer.File | undefined
+  
+        if(blockImage) {
+          const {fileUrl} = await this.fileService.createFile(blockImage);
+          const blockEntity = await this.createNewsBlock(block, fileUrl)
+          updatedNews.blocks.push(blockEntity)
+        } else {
+          const blockEntity = await this.createNewsBlock(block)
+          updatedNews.blocks.push(blockEntity)
+        }
       }
     }
 
@@ -111,17 +131,16 @@ export class NewsService {
       updatedNews.dorm = dorm
     }
 
+    const mainImage = images.find((image) => image.fieldname == 'mainImage') as Express.Multer.File | undefined
 
-    if(!image) {
-      return this.newsRepository.save(updatedNews);
+    if(mainImage) {
+      const {fileName, fileUrl} = await this.fileService.createFile(mainImage);
+      if(fileName && fileUrl) {
+        news.imageName = fileName;
+        news.imageUrl = fileUrl;
+      }
     }
-
-    const {fileName, fileUrl} = await this.fileService.createFile(image);
-    if(fileName && fileUrl) {
-      updatedNews.imageName = fileName;
-      updatedNews.imageUrl = fileUrl;
-    }
-
+    
     return this.newsRepository.save(updatedNews);
   }
 
@@ -236,7 +255,7 @@ export class NewsService {
     }
     if(block.type === NewsBlockType.IMAGE) {
       block = block as NewsImageBlock
-      block.image = 'http://localhost:3005/764c6d28-0ff2-43f8-aecc-7b3d4fc2b352.jpg'
+      block.image = fileUrl
       return await this.newsImageBlockRepository.save(block)
     }
     if(block.type === NewsBlockType.TEXT) {

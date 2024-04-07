@@ -1,5 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, Response, UploadedFile, UseInterceptors } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, Response, UploadedFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { AnyFilesInterceptor, FileInterceptor } from '@nestjs/platform-express';
 import { ApiConsumes, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { WithAuth } from 'src/decorators/with-auth.decorator';
 import { ClassSerializer } from 'src/serializers/class.serializer';
@@ -26,7 +26,7 @@ export class NewsController {
 
   @ClassSerializer(News)
   @Post('/')
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(AnyFilesInterceptor())
   @ApiConsumes('multipart/form-data')
   @ApiResponse({ type: News })
   @Roles("admin", 'worker')
@@ -35,15 +35,16 @@ export class NewsController {
   createNews(
     @Body() newsDto: CreateNewsDto,
     @Req() { user }: RequestWithUser,
-    @UploadedFile() image?: Express.Multer.File
+    @UploadedFiles() images?: Express.Multer.File[]
   ): Promise<News> {
     let blocks = newsDto.blocks 
+
     if(blocks && typeof blocks === 'string') {
       const parsedBlocks = JSON.parse(blocks);
       blocks = Array.isArray(parsedBlocks) ? parsedBlocks : [parsedBlocks]
     }
     
-    return this.newsService.createNews({...newsDto, blocks: blocks}, user.login, image)
+    return this.newsService.createNews({...newsDto, blocks: blocks}, user.login, images)
   }
 
   @ClassSerializer(News)
@@ -53,21 +54,22 @@ export class NewsController {
   })
   @Roles("admin", 'worker')
   @WithRole()
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(AnyFilesInterceptor())
   @ApiConsumes('multipart/form-data')
   @WithAuth()
   @ApiResponse({ type: News })
   updateNews(
     @Body() newsDto: UpdateNewsDto,
     @Param() id: string,
-    @UploadedFile() image?: Express.Multer.File
+    @UploadedFiles() images?: Express.Multer.File[]
   ): Promise<News> {
     let blocks = newsDto.blocks 
     if(blocks && typeof blocks === 'string') {
       const parsedBlocks = JSON.parse(blocks);
       blocks = Array.isArray(parsedBlocks) ? parsedBlocks : [parsedBlocks]
     }
-    return this.newsService.updateNews({...newsDto, blocks: blocks}, id, image)
+
+    return this.newsService.updateNews({...newsDto, blocks: blocks}, id, images)
   }
 
   @ClassSerializer(News)
