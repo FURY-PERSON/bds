@@ -94,6 +94,21 @@ export class BlockService {
     });
   }
 
+  async getByDormId(dormId: string) {
+
+    return this.blockRepository.find({
+      where: {
+        dorm: {
+          id: dormId
+        }
+      },
+      relations: {
+        rooms: true,
+        tenants: true,
+      }
+    });
+  }
+
   async getByIds(ids?: string[]) {
     return this.blockRepository.find({
       where: {

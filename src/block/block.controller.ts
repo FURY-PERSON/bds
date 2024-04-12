@@ -63,8 +63,18 @@ export class BlockController {
   @Roles("admin", 'worker', 'user', 'student')
   @WithRole()
   @ApiResponse({ type: Block })
-  getBlockById(@Param('id') name: string): Promise<Block> {
-    return this.blockService.getById(name)
+  getBlockById(@Param('id') id: string): Promise<Block> {
+    return this.blockService.getById(id)
+  }
+
+  @ClassSerializer(Block)
+  @Get('dorm/:dormId')
+  @WithAuth()
+  @Roles("admin", 'worker')
+  @WithRole()
+  @ApiResponse({ type: [Block] })
+  getBlocksByDormId(@Param('dormId') dormId: string): Promise<Block[]> {
+    return this.blockService.getByDormId(dormId)
   }
 
   @ClassSerializer(Block)
