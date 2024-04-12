@@ -224,6 +224,8 @@ export class UsersService {
       email: userDto.email ?? user.email,
       refreshToken: userDto.refreshToken ?? user.refreshToken,
       averageMark: userDto.averageMark ?? user.averageMark,
+      budget: userDto.budget ?? user.budget,
+      course: userDto.course ?? user.course,
     })
 
     if(userDto.roleName && user.role.name !== userDto.roleName) {
