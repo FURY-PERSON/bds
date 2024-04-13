@@ -14,6 +14,7 @@ import { MessageProviderService } from 'src/messageProvider/messageProvider.serv
     TypeOrmModule.forFeature([Room]),
     BlockModule,
     UsersModule
-  ]
+  ],
+  exports: [RoomService]
 })
 export class RoomModule {}

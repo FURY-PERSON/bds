@@ -165,7 +165,6 @@ export class UsersService {
         permissions: relations,
         notifications: relations,
         featureFlags: relations,
-        room: relations,
         block: relations,
         rebukes: relations,
         scientificWorks: relations
@@ -173,6 +172,42 @@ export class UsersService {
     });
     
     return user;
+  }
+  
+  async getById(id: string, relations = true) {
+    const user = await this.usersRepository.findOne({
+      where: {
+        id: id
+      },
+      relations: {
+        role: relations,
+        permissions: relations,
+        notifications: relations,
+        featureFlags: relations,
+        block: relations,
+        rebukes: relations,
+        scientificWorks: relations
+      }
+    });
+    
+    return user;
+  }
+  
+  async getAllByDorm(dormId: string) {
+    const users = await this.usersRepository.find({
+      where: {
+        block: {
+          dorm: {
+            id: dormId
+          }
+        }
+      },
+      relations: {
+        room: true,
+      }
+    });
+    
+    return users;
   }
 
 
@@ -238,7 +273,7 @@ export class UsersService {
       updatedUser.role = newRole
     }
 
-    this.messageProvider.sendMessage(MessageExchange.DEFAULT, MessageRoute.USER_CREATE, {
+    this.messageProvider.sendMessage(MessageExchange.DEFAULT, MessageRoute.USER_UPDATE, {
       id: updatedUser.id,
       role: updatedUser.role.name
     })

@@ -29,6 +29,7 @@ import { FeatureFlagModule } from './feature-flag/feature-flag.module';
 import { MessageProviderModule } from './messageProvider/messageProvider.module';
 import { ScientificWorksModule } from './scientificWorks/scientificWorks.module';
 import { RebukeModule } from './rebuke/rebuke.module';
+import { SettlementModule } from './settlement/settlement.module';
 
 @Module({
   controllers: [],
@@ -69,7 +70,8 @@ import { RebukeModule } from './rebuke/rebuke.module';
     FeatureFlagModule,
     MessageProviderModule,
     ScientificWorksModule,
-    RebukeModule
+    RebukeModule,
+    SettlementModule
   ],
 })
 export class AppModule {

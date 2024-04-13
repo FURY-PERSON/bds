@@ -121,7 +121,7 @@ export class RoomService {
     if(!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND)
     }
-
+    
     const room = await this.roomRepository.findOne({
       where: {
         id: id 
@@ -133,7 +133,7 @@ export class RoomService {
     })
 
     if(!room) {
-      throw new HttpException('Block not found', HttpStatus.NOT_FOUND)
+      throw new HttpException('Room not found', HttpStatus.NOT_FOUND)
     }
 
     if(user.room) {
@@ -167,7 +167,19 @@ export class RoomService {
   }
 
 
-  async deleteUserFromRoom(deleteUserFromRoomDto: DeleteUserFromRoom, id: string) {
+  async deleteUserFromRoom(deleteUserFromRoomDto: DeleteUserFromRoom, id?: string) {
+    const user = await this.usersService.getByLogin(deleteUserFromRoomDto.userLogin)
+
+    if(!user) {
+      throw new NotFoundException(`User ${deleteUserFromRoomDto.userLogin} not found`)
+    }
+
+    if(!id) {
+      await this.blockService.deleteUserFromBlock({userLogin: deleteUserFromRoomDto.userLogin}, user.block.id).catch(() => {})
+      return;
+    }
+
+
     const room = await this.roomRepository.findOne({
       where: { id },
       relations: {
