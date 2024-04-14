@@ -4,4 +4,5 @@ export interface GetAllBlocksParam extends QueryParam {
   number?: string;
   orderBy?: "DESC" | "ASC";
   floor?: number,
+  dormId?: string
 }

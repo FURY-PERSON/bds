@@ -13,10 +13,10 @@ export class SettlementController {
 
   }
 
-
   @Post('/apply-settlement')
   @WithAuth()
-  async create(@Body() settlementDto: ApplySettlementDto): Promise<void> {
-    this.settlementService.applySettlement(settlementDto)
+  async create(@Body() settlementsDto: {settlement: ApplySettlementDto[]}): Promise<void> {
+    const settlementPromises = settlementsDto.settlement.map((settlement) => this.settlementService.applySettlement(settlement))
+    Promise.all(settlementPromises)
   }
 }

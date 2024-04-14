@@ -70,16 +70,6 @@ export class BlockController {
   @ClassSerializer(Block)
   @Get('dorm/:dormId')
   @WithAuth()
-  @Roles("admin", 'worker')
-  @WithRole()
-  @ApiResponse({ type: [Block] })
-  getBlocksByDormId(@Param('dormId') dormId: string): Promise<Block[]> {
-    return this.blockService.getByDormId(dormId)
-  }
-
-  @ClassSerializer(Block)
-  @Get('/')
-  @WithAuth()
   @ApiQuery({
     name: "ids",
     type: String,
@@ -115,21 +105,71 @@ export class BlockController {
   @WithRole()
   @ApiResponse({ type: [Block] })
   async getAllBlocksByIds( 
+    @Param('dormId') dormId: string,
     @Query('ids') ids?: string[],
     @Query('page') page?: number,
     @Query('limit') limit?: number,
     @Query('orderBy') orderBy: 'DESC' | 'ASC' = 'DESC',
     @Query('floor') floor?: number,
     @Query('number') number?: string,
-    @Response() res?: Res
+    @Response() res?: Res,
     ) {
 
     if(ids) {
       const blocksIds = Array.isArray(ids) ? ids : [ids];
-      const blocks = await this.blockService.getByIds(blocksIds);
+      const blocks = await this.blockService.getByIds(dormId, blocksIds);
       res.send(blocks)
       return blocks
     }
+
+    const {result, total, totalPage} = await this.blockService.getAllBlocks({page, limit, orderBy, floor, number, dormId})
+    res.set({'X-Total-Item': total })
+    res.set({'X-Current-Page': page })
+    res.set({'X-Total-Page': totalPage})
+    res.send(result)
+    return result
+  }
+
+  @ClassSerializer(Block)
+  @Get('/')
+  @WithAuth()
+  @ApiQuery({
+    name: "page",
+    type: Number,
+    required: false,
+  })
+  @ApiQuery({
+    name: "limit",
+    type: Number,
+    required: false,
+  })
+  @ApiQuery({
+    name: "number",
+    type: String,
+    required: false,
+  })
+  @ApiQuery({
+    name: "floor",
+    type: Number,
+    required: false,
+  })
+  @ApiQuery({
+    name: "orderBy",
+    type: String,
+    required: false,
+  })
+  @Roles("admin", 'worker', 'user', 'student')
+  @WithRole()
+  @ApiResponse({ type: [Block] })
+  async getAll( 
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+    @Query('orderBy') orderBy: 'DESC' | 'ASC' = 'DESC',
+    @Query('floor') floor?: number,
+    @Query('number') number?: string,
+    @Response() res?: Res,
+    ) {
+
 
     const {result, total, totalPage} = await this.blockService.getAllBlocks({page, limit, orderBy, floor, number})
     res.set({'X-Total-Item': total })
@@ -138,7 +178,6 @@ export class BlockController {
     res.send(result)
     return result
   }
-
 
 
   @ClassSerializer(BlockSanitaryVisit)

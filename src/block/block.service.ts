@@ -109,10 +109,13 @@ export class BlockService {
     });
   }
 
-  async getByIds(ids?: string[]) {
+  async getByIds(dormId: string, ids?: string[]) {
     return this.blockRepository.find({
       where: {
         id: ids ? In(ids) : undefined,
+        dorm: {
+          id: dormId
+        }
       },
       relations: {
         dorm: true,
@@ -128,6 +131,7 @@ export class BlockService {
     const numberSearch = query.number || '';
     const orderBy = query.orderBy;
     const floor = query.floor;
+    const dormId = query.dormId
 
     const createdQuery = this.blockRepository.createQueryBuilder('block')
       .leftJoin('block.dorm', 'dorm')
@@ -141,6 +145,10 @@ export class BlockService {
       ])
       .where('block.number ILIKE :number', {number: `%${numberSearch}%`})
       .orderBy('block.number', orderBy);
+
+      if(dormId) {
+        createdQuery.andWhere('dorm.id = :dormId', {dormId}); 
+      }
 
       if(floor) {
         createdQuery.andWhere('block.floor::text LIKE :floor', {floor: `%${floor}%`})
