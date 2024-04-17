@@ -16,7 +16,7 @@ export class FilesService {
 
       fs.writeFileSync(path.join(filePath, fileName), file.buffer)
       
-      const fileUrl = `http://localhost:${PORT}/` + fileName;
+      const fileUrl = `http://${process.env.DOMAIN}:${PORT}/static/` + fileName;
 
       return {fileName, fileUrl}
     } catch(e) {
