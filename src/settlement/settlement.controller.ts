@@ -4,7 +4,7 @@ import { WithAuth } from 'src/decorators/with-auth.decorator';
 import { ApplySettlementDto } from './dto/applySettlement.dto';
 import { ApiTags } from '@nestjs/swagger';
 
-@Controller('settlement')
+@Controller('dorm-settlement')
 @ApiTags('Settlement')
 export class SettlementController {
   constructor(
