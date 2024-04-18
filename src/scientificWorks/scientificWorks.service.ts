@@ -116,7 +116,7 @@ export class ScientificWorksService {
     const scientificWork = await this.scientificWorkRepository.findOne({
       where: { id },
       relations: {
-          user: true
+        user: true
       }
     });
 
@@ -125,6 +125,8 @@ export class ScientificWorksService {
     }
 
     await this.scientificWorkRepository.remove(scientificWork)
+
+    this.updateUserScientificWorks(scientificWork.user.login)
   }
 
   private async updateUserScientificWorks(userLogin: string) {

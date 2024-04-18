@@ -99,7 +99,7 @@ export class RebukeService {
     const rebuke = await this.rebukeRepository.findOne({
       where: { id },
       relations: {
-          user: true
+        user: true
       }
     });
 
@@ -108,6 +108,8 @@ export class RebukeService {
     }
 
     await this.rebukeRepository.remove(rebuke)
+
+    this.updateUserRebukes(rebuke.user.login)
   }
 
   private async updateUserRebukes(userLogin: string) {
