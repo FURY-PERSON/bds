@@ -6,6 +6,7 @@ import { ValidationPipe } from './pipes/validation.pipe';
 
 export let app: INestApplication;
 export const PORT = process.env.PORT || 3000;
+export const STATIC_PORT = process.env.STATIC_PORT || 3000;
 
 async function bootstrap() {
   app = await NestFactory.create(AppModule, {cors: true});

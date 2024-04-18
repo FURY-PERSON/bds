@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as fs from "fs";
 import * as path from "path";
-import { app, PORT } from 'src/main';
+import { app, STATIC_PORT } from 'src/main';
 import * as uuid from "uuid";
 
 @Injectable()
@@ -16,7 +16,7 @@ export class FilesService {
 
       fs.writeFileSync(path.join(filePath, fileName), file.buffer)
       
-      const fileUrl = `http://${process.env.DOMAIN}:${PORT}/static/` + fileName;
+      const fileUrl = `http://${process.env.DOMAIN}:${STATIC_PORT}/static/` + fileName;
 
       return {fileName, fileUrl}
     } catch(e) {
