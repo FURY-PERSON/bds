@@ -23,8 +23,9 @@ export class SettlementService {
       ?.map(async (user) => {
         const userFromServer = await this.usersService.getById(user.id);
 
+
         if(!userFromServer) {
-          new HttpException('User not found', HttpStatus.NOT_FOUND)
+          throw new HttpException('User not found', HttpStatus.NOT_FOUND)
         }
 
         await this.roomService.addUserToRoom({userLogin: userFromServer.login}, user.roomId)

@@ -17,6 +17,6 @@ export class SettlementController {
   @WithAuth()
   async create(@Body() settlementsDto: ApplySettlementDto[]): Promise<void> {
     const settlementPromises = settlementsDto.map((settlement) => this.settlementService.applySettlement(settlement))
-    Promise.all(settlementPromises)
+    await Promise.all(settlementPromises)
   }
 }
